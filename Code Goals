@@ -1,0 +1,38 @@
+Staircase method is going to need to be able to adjust presentation stimuli.
+
+Present a plus in the middle of the screen that never goes away
+
+Fixation
+  Use eye tracker.  Don't start trial until subject has foveated on plus sign for 1000 ms
+  Start trial
+  If at any point in the subject saccades outside of the center, record the trial as "fail"
+
+Present a cue
+  1/3 of the time, present a neutral cue
+  2/3 of the time, present a cue in one direction
+  Randomize which direction the cue is
+  
+ISI
+
+Present stimuli
+  same location every time
+  variables we're adjusting are size and location of gap
+  gap can be top or bottom
+  size is going to be adjusted by the staircase method
+  (Might be a good idea to read a paper about staircase method how to????)
+  
+ ISI
+ 
+Response cue
+  70% of the 2/3 of the remaining time, present a valid response cue
+  30% of the 2/3 of the remaining time, present an invalid response cue
+  
+Record response
+  use left and write keys to record response
+  if correct, adjust stimulus accordingly
+  if incorrect, adjust stimulus accordingly
+  record trial type
+  record result (correct or incorrect)
+  record reaction time
+  record difficulty
+  
