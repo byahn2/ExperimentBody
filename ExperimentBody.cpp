@@ -354,6 +354,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			    Y = 0;
 			}
 			// show the cue at fixation and hide the fixation point
+			//WE DON"T WANT TO HIDE THE FIXATION POINT
 			m_fixation->hide();
 			TimeFixationOFF = m_timerExp.getTime();
 			// if neutral cue is on or if a neutral catch trial is on
@@ -689,11 +690,13 @@ void ExperimentBody::gotoFixation()
 		
 }
 ///////////////////////////////////////////////////////////////////////////////////
+//We need to save the response and the stimulus size here
 void ExperimentBody::saveData()
 {
 
 		if (ResponseTime>0)
 	    // give confrimation of response
+	    //do we need the beep
 		Beep(600,400);
 
 		// time of the response (locked to the start of the trial)
@@ -737,6 +740,7 @@ void ExperimentBody::saveData()
 		storeTrialVariable("CueTargetTiming", CueTargetTime);
 		
 		// save size of stimuli in px
+		//HERE WE WANT TO SAVE THE SIZE OF THE GAP, NOT THE TARGET
 		storeTrialVariable("FixationMarkerSize", m_paramsFile->getInteger(CFG_FIXATION_SIZE));
 		storeTrialVariable("CueSize", m_paramsFile->getInteger(CFG_CUE_SIZE));
 		storeTrialVariable("TargetSize", m_paramsFile->getInteger(CFG_TARGET_SIZE));
