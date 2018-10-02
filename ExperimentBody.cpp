@@ -5,8 +5,6 @@
 
 const float PI = 3.1415926353f;
 
-// ad 8 26 2013 - add two dots (as boxes at the two sides for the small posner version
-
 ///////////////////////////////////////////////////////////////////////////////////
 ExperimentBody::ExperimentBody(int pxWidth, int pxHeight, int RefreshRate, CCfgFile* Params) :
 	CExperiment(pxWidth, pxHeight, RefreshRate), 
@@ -23,12 +21,14 @@ void ExperimentBody::initialize()
 {		
 	CStabilizer::Instance()->enableSlowStabilization(true);
 	
+	
 	m_fixation = addObject(new CImagePlane("images/fixation.tga"));
 	m_fixation->enableTrasparency(true);
-    m_fixation->pxSetSize(10,10);
+    	m_fixation->pxSetSize(10,10);
 	m_fixation->pxSetPosition(0,0);
 	m_fixation->hide();
 	
+	//change in parameter file
 	m_cue = addObject(new CImagePlane("images/cue.tga"));
 	m_cue->enableTrasparency(true);
 	m_cue->pxSetSize(m_paramsFile->getInteger(CFG_CUE_SIZE),m_paramsFile->getInteger(CFG_CUE_SIZE));
@@ -48,48 +48,7 @@ void ExperimentBody::initialize()
 	m_box->enableTrasparency(true);
 	m_box->hide();
 
-	
-
-	// large and small posner
-	if (m_paramsFile->getInteger(CFG_TARGET_OFFSET)>100)
-	{
-	m_box1 = addObject(new CImagePlane("images/box.tga"));
-	m_box1->enableTrasparency(true);
-	m_box1->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box1->pxSetPosition(0,0);
-	m_box1->enableTrasparency(true);
-	m_box1->hide();
-
-	m_box2 = addObject(new CImagePlane("images/box.tga"));
-	m_box2->enableTrasparency(true);
-	m_box2->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box2->pxSetPosition(0,0);
-	m_box2->enableTrasparency(true);
-	m_box2->hide();
-	}
-	else
-	{
-	m_box1 = addObject(new CImagePlane("images/boxsmall.tga"));
-    m_box1->pxSetSize(m_paramsFile->getInteger(CFG_TARGET_SIZE),m_paramsFile->getInteger(CFG_TARGET_SIZE));
-	m_box1->hide();
-
-
-	m_box2 = addObject(new CImagePlane("images/boxsmall.tga"));
-    m_box2->pxSetSize(m_paramsFile->getInteger(CFG_TARGET_SIZE),m_paramsFile->getInteger(CFG_TARGET_SIZE));
-	m_box2->hide();
-	}
-	
-	m_target = addObject(new CSolidPlane(400,400,400));
-    m_target->pxSetSize(m_paramsFile->getInteger(CFG_TARGET_SIZE),m_paramsFile->getInteger(CFG_TARGET_SIZE));
-	// color red
-	m_target->setColor(255,0,0);
-	m_target->hide();
-
-
-
-
-
-	// set the pixel increment for the test calibration procedure during the exp
+	// set the pixel increment for the test calibration procedure during the exp (NO CHANGES)
 	Increment = 1;
 	ResponseFinalize = 0;
 	xshift = 0;
@@ -103,13 +62,13 @@ void ExperimentBody::initialize()
 	NumberValidTrials = 0;
 	CurrentRTInvalid = 0;
 	NumberInvalidTrials = 0;
-    CurrentRTNeutral = 0;
+    	CurrentRTNeutral = 0;
 	NumberNeutralTrials = 0;
 	// set TestCalibration = 1 so that the experiment will start with a recalibration trial
 	TestCalibration = 1;
 	m_numCompleted  = 0;
 	
-	// crosses for the recalibration trials	
+	// crosses for the recalibration trials	 (NO CHANGES)
 	m_redcross = addObject(new CImagePlane("images/redcross.tga"));
 	m_redcross->enableTrasparency(true);
 	m_redcross->hide();
@@ -125,7 +84,7 @@ void ExperimentBody::initialize()
 	disable(CExperiment::EIS_NOTRACK_ICON);
 	disable(CExperiment::EIS_STAT1);
 	
-	// set the distance of the target from the gaze
+	// set the distance of the target from the gaze (NO CHANGES)
 	XTargetOffset = m_paramsFile->getInteger(CFG_TARGET_OFFSET);
 	debug = m_paramsFile->getInteger(CFG_DEBUG);
 	
@@ -137,14 +96,13 @@ void ExperimentBody::initialize()
 	
 	/* Seed the random-number generator with current time so that
     * the numbers will be different every time we run.*/
-	
     srand( (unsigned)time( NULL ) );
 
 
 }
 ///////////////////////////////////////////////////////////////////////////////////
 // write the progress file
-void ExperimentBody::finalize()
+void ExperimentBody::finalize() ///(NO CHANGE)
 {
 	// write progress
 	if(m_numCompleted > 0)//check to see that some experiments have been conducted
@@ -165,7 +123,7 @@ void ExperimentBody::finalize()
 			declareFinished();
 
 		}
-	    // keep track of the last trial played in the list and start from there in the next session
+	    // If there were previous sessions/trials keep track of the last trial played in the list and start from there in the next session
 		out1<< "Recorded: " << LocalDate <<endl;
 		out1<< m_sessionBegin  << endl;
 		out1<< m_sessionEnd << endl;
@@ -181,6 +139,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 	// store the stabilized trace ( --- all in px)
 	if (SHOW_TARGET==0)
 	{
+		//HEY BY THE WAY THERE DOESN'T APPEAR TO BE A CSTABILIZER IN THE EYERIS
 	CStabilizer::Instance()->
 				stabilize(Samples, X, Y);  
     X = X+xshift;
@@ -197,12 +156,10 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 	}
 	
 	m_box1->pxSetPosition(X+XTargetOffset, Y);
-	m_box2->pxSetPosition(X-XTargetOffset, Y);
 	m_box1->show();
-    m_box2->show();
-	float x;
-	float y;
-	float dist;
+// 	float x;
+// 	float y;
+// 	float dist;
 	//m_box->show();
 	//m_whitecross->show();
  
@@ -225,6 +182,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			time_t t = time(NULL);
 			strftime(LocalDate, 1024, "%Y-%m-%d-%H-%M-%S", localtime(&t));
 
+			//WE WILL NEED TO CHANGE THE DESTINATION FILENAME (IN PARAMETERS)
 			ostringstream DestinationFileName;
 			DestinationFileName << m_paramsFile->getDirectory(CFG_DATA_DESTINATION) << 
 				m_paramsFile->getString(CFG_SUBJECT_NAME) << "/" << m_paramsFile->getString(CFG_SUBJECT_NAME) << 
@@ -234,12 +192,13 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 
 		break;
 
+	//NO NEED TO CHANGE ANYTHING IN THIS SECTION
 	case STATE_TESTCALIBRATION:
 		
 		m_box1->hide();
-		m_box2->hide();
 		if (!m_timerCheck.isExpired())
 		{
+			//NO CCONVERTER IN EYERIS
 			CConverter::Instance()->a2p(Samples->x1, Samples->y1, x, y);
 		}
 		else
@@ -288,14 +247,16 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 	//use stabilized positions acquired at the beginning of the render cycle 
 	Dist = sqrt((pow(0 - (X) , 2) + pow(0 - (Y) , 2)));
 
-	if (((Dist < 100)&& 
+	//DON'T NEED TO CHANGE		
+	if (((Dist < 100) && 
 			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_BADDATA) &&
-			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_EMEVENT) ) && (gate==1)||
+			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_EMEVENT) ) && (gate==1)
+	    ||
 			((debug == 1) && (gate==1)))
 	{		
 	       // enter here only the first time stabilization is activated
 	
-			// this initialize stabilizer settings the first time
+			// this initializes stabilizer settings the first time
 			//	stabilization routine is entered.
 			// reset the filter with positions in arcmin
 				CStabilizer::Instance()->
@@ -308,6 +269,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 				m_timerfixation.start(m_paramsFile->getInteger(CFG_FIXATION_TIME));
 			
 	}
+	//gate = 0 means subject is looking at fixation  ????	
 	if (gate==0)
 	{
 
@@ -344,7 +306,8 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 		// check if the subject is looking at the fixation and that there is a drift (no saccades or notrack)
 		if (((gate==0) && 
 			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_BADDATA) &&
-			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_EMEVENT) && (m_timerfixation.isExpired()))||
+			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_EMEVENT) && (m_timerfixation.isExpired()))
+		    ||
 			((debug==1) && (gate==0)))
 		{
 
@@ -353,11 +316,14 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 				X = 0;
 			    Y = 0;
 			}
-			// show the cue at fixation and hide the fixation point
-			//WE DON"T WANT TO HIDE THE FIXATION POINT
-			m_fixation->hide();
+			// show the cue at fixation and hide the fixation point (don't hide fixation)
+			//m_fixation->hide();
+			//records when fixation breaks
 			TimeFixationOFF = m_timerExp.getTime();
 			// if neutral cue is on or if a neutral catch trial is on
+			//CueDirection == 3 is neutral?
+			//WE DON'T HAVE A CATCH TRIAL SO THAT NEEDS TO BE REMOVED
+			//CATCH TRIAL IS TRIAL TYPE 3
 			if ((TrialType == 2) || ((TrialType == 3) && (CueDirection == 3)))
 			{
 				m_neutralcue->pxSetPosition(X,Y);
@@ -376,6 +342,8 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			m_timercue.start(m_paramsFile->getInteger(CFG_CUE_TIME));
 
 		}
+			//WE ARE KEEPING THE FIXATION POINT, SO GATE SHOULD ALWAYS = 0?? 
+			//If cue hasn't expired and gate == 1 then continue to stabalize cue
 		if ((!m_timercue.isExpired()) && (gate==1))
 		{
 			// continue to stabilize the cue
@@ -394,13 +362,15 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			{
 			m_cue->pxSetPosition(X,Y);
 			m_cue->show();	
-			m_fixation->hide();
+// 			m_fixation->hide();
 			}
 		}
 		// when the time for the cue is over go to the next state 
 		else if ((m_timercue.isExpired()) && (gate==1))
 		{
 
+			//if trial is NOT type three (not catch_ then STATE = target ad reinstate fixation cue
+			//WE WILL BE KEEPING THE FIXATION CUE THE WHOLE TIME, SO THIS IS UNECESSARY
 			if (!(TrialType == 3))
 			{
 			
@@ -416,6 +386,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			m_cue->hide();
 			m_neutralcue->hide();
 			gate = 0;
+			//get the time when the cue disappears
 			TimeCueOFF = m_timerExp.getTime();
 			}
 			// catch trial (no target appears -> go directly to response)
@@ -436,11 +407,14 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 	
 	// STATE_TARGET: present the target
 	//              go to the next state and wait for subject response
+	//THINGS TO CHANGE: we need to targets.  we need a variable for target orientation.  we need an occluder of different sizes
+	//to put in front of the image.  we need two options for the location of each bar.  we need to keep track of where it is.
 	case STATE_TARGET:
 			
 			//CEnvironment::Instance()->outputMessage("State Target");
 			// continue to stabilize the fixation marker;
 		
+			//question
 			m_fixation->pxSetPosition(X,Y);
 			m_fixation->show();
 			if (debug==1)
@@ -457,7 +431,8 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			TimeTargetON = m_timerExp.getTime();
 			// set target duration
 			m_timertarget.start(m_paramsFile->getInteger(CFG_TARGET_TIME));
-			gate = 1;
+			//NEED TO LOOK AT TARGET THE ENTIRE TIME SO GATE = 0? WHAT DOES GATE MEAN?
+				gate = 1;
 			}
 			if ((gate==1) && (m_timertarget.isExpired()))
 			{ // go to the next state
@@ -470,6 +445,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			TimeTargetOFF = m_timerExp.getTime();
 			
 			}
+			//If timer isn't expired, continue to show the target
 			else if ((gate==1) && (!m_timertarget.isExpired()))
 			{
 			m_fixation->pxSetPosition(X,Y);
@@ -480,7 +456,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 
 	
 	break;
-	
+	//WHERE IS THE PART WITH THE RESPONSE CUE?
 	// STATE_RESPONSE: wait for subject response
 	case STATE_RESPONSE:
 			
@@ -528,6 +504,7 @@ void ExperimentBody::eventJoypad()
 {
 	// activate the joypad only in the state calibration	
 
+			//NO NEED TO CHANGE
 			if (m_state == STATE_TESTCALIBRATION) 
 			{				
 
@@ -560,8 +537,10 @@ void ExperimentBody::eventJoypad()
 
 				}
 		   }
+			//WE NEED TO KEEP TRACK OF RESPONSES AND KEEP TRACK OF WHAT TYPE OF TRIAL THE RESPONSE WAS IN
 			if (STATE_RESPONSE)
 			{
+				//WE'RE USING UP AND DOWN BUTTONS INSTEAD OF R1 AND L1
 				if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // location of T1 identified
 				{
 					WAIT_RESPONSE = 1;
@@ -606,6 +585,7 @@ void ExperimentBody::gotoFixation()
 		if (TrialType == 1) 
 		{
 	      NumberValidTrials++;
+		//SET CUE ANGLE?
 		if (CueDirection==-1)
 		{
 		CEnvironment::Instance()->outputMessage("Valid trial - cue direction to the left ");
@@ -638,6 +618,8 @@ void ExperimentBody::gotoFixation()
 	
 		}
 		// neutral trials (a neutral cue is shown)
+		// target to the right and left??? what does this mean
+		//PROBABLY HAVE TO CHANGE THIS A BIT
 		else if (TrialType == 2)
 		{
 	    NumberNeutralTrials++;
@@ -682,6 +664,7 @@ void ExperimentBody::gotoFixation()
 	m_timer.start(1000);
 	gate=1;
 
+	//we need a cue list.  Might need a stimulus list.  Their stimulus list is a list of cues
 	if(m_curStim == (CueDirectionList.size()-1) )
 	{
 		m_curStim = 0;//loop the stimulus list from the beginning 
@@ -691,13 +674,14 @@ void ExperimentBody::gotoFixation()
 }
 ///////////////////////////////////////////////////////////////////////////////////
 //We need to save the response and the stimulus size here
+//WE NEED TO SAVE THE ACTUAL RESPONSE
 void ExperimentBody::saveData()
 {
 
 		if (ResponseTime>0)
 	    // give confrimation of response
 	    //do we need the beep
-		Beep(600,400);
+		//Beep(600,400);
 
 		// time of the response (locked to the start of the trial)
 		storeTrialVariable("ResponseTime", ResponseTime);
@@ -707,8 +691,9 @@ void ExperimentBody::saveData()
 		storeTrialVariable("TimeFixationOFF", TimeFixationOFF); 
 		storeTrialVariable("TimeTargetON", TimeTargetON);
 		storeTrialVariable("TimeTargetOFF", TimeTargetOFF);
+		//WE NEED TO STORE IF RESPONSE WAS CORRECT, IF TRIAL WAS VALID OR INVALID, AND THE SIZE OF THE GAP
 
-		
+		//WE CAN KEEP THIS IF WE WANT, BUT WE NEED TO ADD, GAP SIZE, CORRECT, INCORRECT
 		CEnvironment::Instance()->outputMessage("Cue target timing: %.2i", CueTargetTime);
 		if (TrialType==1)
 		{
