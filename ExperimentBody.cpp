@@ -691,6 +691,8 @@ void ExperimentBody::saveData()
 		storeTrialVariable("TimeFixationOFF", TimeFixationOFF); 
 		storeTrialVariable("TimeTargetON", TimeTargetON);
 		storeTrialVariable("TimeTargetOFF", TimeTargetOFF);
+		//STORETRIALVARIABLE("CORRECTRESPONSE", CORRECT);
+		//STORETRIALVARIABLE("GAPSIZE", GAPSIZE);
 		//WE NEED TO STORE IF RESPONSE WAS CORRECT, IF TRIAL WAS VALID OR INVALID, AND THE SIZE OF THE GAP
 
 		//WE CAN KEEP THIS IF WE WANT, BUT WE NEED TO ADD, GAP SIZE, CORRECT, INCORRECT
