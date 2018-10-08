@@ -2,16 +2,25 @@ CPP FILE:
 
 // STATE_TARGET: present the target
 	//              go to the next state and wait for subject response
-	//THINGS TO CHANGE: we need to targets.  we need a variable for target orientation.  we need an occluder of different sizes
+	//THINGS TO CHANGE: we need two targets.  we need a variable for target orientation.  we need an occluder of different sizes
 	//to put in front of the image.  we need two options for the location of each bar.  we need to keep track of where it is.
 	case STATE_TARGET:
+	
 			
 			//CEnvironment::Instance()->outputMessage("State Target");
 			// continue to stabilize the fixation marker;
 		
 			//question
+			
+			
 			m_fixation->pxSetPosition(X,Y);
 			m_fixation->show();
+			
+			TARGET_LEFT_ORIENTATION -> GETORENTATION();//INT
+			TARGET_RIGHT_ORIENTATION -> GETORENTATION();//INT
+			
+			TARGET_SIZE -> GETTARGETSIZE();//INT, PERCENTAGE
+			
 			if (debug==1)
 			{
 				X = 0;
@@ -20,15 +29,25 @@ CPP FILE:
 
 			if (m_timerisi.isExpired() && (gate==0))
 			{
-		    SHOW_TARGET = 1;
+			
+		   	SHOW_TARGET = 1;
 			m_target->pxSetPosition(X+XTargetOffset, Y);
+			
+			M_LeftTARGET -> SET LEFT TARGET ORIENTATION
+			M_RightTARGET -> SET RIGHT TARGET ORITATION
+			
+			
+			
 			m_target->show();	
 			TimeTargetON = m_timerExp.getTime();
 			// set target duration
 			m_timertarget.start(m_paramsFile->getInteger(CFG_TARGET_TIME));
 			//NEED TO LOOK AT TARGET THE ENTIRE TIME SO GATE = 0? WHAT DOES GATE MEAN?
 				gate = 1;
-        }
+        		}
+			
+			
+			
 			if ((gate==1) && (m_timertarget.isExpired()))
 			{ // go to the next state
 			
@@ -40,6 +59,8 @@ CPP FILE:
 			TimeTargetOFF = m_timerExp.getTime();
 			
 			}
+			
+			
 			//If timer isn't expired, continue to show the target
 			else if ((gate==1) && (!m_timertarget.isExpired()))
 			{
@@ -51,5 +72,3 @@ CPP FILE:
 
 	
 	break;
-	//WHERE IS THE PART WITH THE RESPONSE CUE?
-	// STATE_RESPONSE: wait for subject response
