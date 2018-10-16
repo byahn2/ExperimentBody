@@ -1,0 +1,108 @@
+//We need to save the response and the stimulus size here
+//WE NEED TO SAVE THE ACTUAL RESPONSE
+void ExperimentBody::saveData()
+{
+
+		if (ResponseTime>0)
+	    // give confrimation of response
+	    //do we need the beep
+		//Beep(600,400);
+
+		// time of the response (locked to the start of the trial)
+		storeTrialVariable("ResponseTime", ResponseTime);
+		storeTrialVariable("TimeCueON", TimeCueON);
+		storeTrialVariable("TimeCueOFF", TimeCueOFF);
+		storeTrialVariable("TimeTargetON", TimeTargetON);
+		storeTrialVariable("TimeTargetOFF", TimeTargetOFF);
+    
+
+		storeTrialVariable("TrialType", TrialType);
+		storeTrialVariable("CueDirection", CueDirection);
+    storeTrialVariable("GapSize", GapSize);
+    
+    storeTrialVariable("CorrectAnswer", CorrectAnswer);
+    storeTrialVariable("AnswerDirection", AnswerDirection);
+    storeTrialVariable("Correctness", isCorrect);
+    
+    
+    
+		//STORETRIALVARIABLE("CORRECTRESPONSE", CORRECT); done
+		//STORETRIALVARIABLE("GAPSIZE", GAPSIZE); done
+		//WE NEED TO STORE IF RESPONSE WAS CORRECT, IF TRIAL WAS VALID OR INVALID, AND THE SIZE OF THE GAP done
+
+
+
+
+		//WE CAN KEEP THIS IF WE WANT, BUT WE NEED TO ADD, GAP SIZE, CORRECT, INCORRECT
+		CEnvironment::Instance()->outputMessage("Cue target timing: %.2i", CueTargetTime);
+		if (TrialType==1)
+		{
+		CurrentRTValid = CurrentRTValid + (ResponseTime-TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("valid trial number - %i ", NumberValidTrials);
+		CEnvironment::Instance()->outputMessage("RT valid (running average) - %f ", CurrentRTValid/NumberValidTrials);
+		}
+
+		if (TrialType==0)
+		{
+		CurrentRTInvalid = CurrentRTInvalid + (ResponseTime-TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("invalid trial number - %i ", NumberInvalidTrials);
+		CEnvironment::Instance()->outputMessage("RT invalid (running average) - %f ", CurrentRTInvalid/NumberInvalidTrials);
+		}
+
+		if (TrialType==2)
+		{
+		CurrentRTNeutral = CurrentRTNeutral + (ResponseTime-TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("neutral trial number - %i ", NumberNeutralTrials);
+		CEnvironment::Instance()->outputMessage("RT neutral (running average) - %f ", CurrentRTNeutral/NumberNeutralTrials);
+		}
+
+		
+		
+		// save size of stimuli in px
+		//HERE WE WANT TO SAVE THE SIZE OF THE GAP, NOT THE TARGET
+		storeTrialVariable("FixationMarkerSize", m_paramsFile->getInteger(CFG_FIXATION_SIZE));
+		storeTrialVariable("CueSize", m_paramsFile->getInteger(CFG_CUE_SIZE));
+		storeTrialVariable("TargetSize", m_paramsFile->getInteger(CFG_TARGET_SIZE));
+		storeTrialVariable("BoxSize", m_paramsFile->getInteger(CFG_BOX_SIZE));		
+		
+
+		// 
+		storeTrialVariable("X_TargetOffset", XTargetOffset);//px
+		storeTrialVariable("Subject_Name", m_paramsFile->getString(CFG_SUBJECT_NAME));
+		
+		// save information about the test calibration
+		storeTrialVariable("TestCalibration", TestCalibration);
+		storeTrialVariable("xoffset", xshift);
+		storeTrialVariable("yoffset", yshift); //px
+
+		storeTrialVariable("debug", debug); //px
+
+		saveTrial("./Data/" + m_paramsFile->getString(CFG_SUBJECT_NAME));
+		
+		//update progress through session
+		m_sessionEnd = m_curStim-1;
+		
+		// keep track of the test calibration trials
+		m_numTestCalibration++;
+		
+		// recalibration active at each trial
+		if (m_numTestCalibration == 1) 
+	    {
+			xPos = 0;
+			yPos = 0;
+			TestCalibration = 1;
+			ResponseFinalize = 0;
+			m_numTestCalibration = 0;
+			m_timerCheck.start(100);
+			m_whitecross->pxSetPosition(0,0);
+			m_whitecross->show();
+	    }
+
+		m_curStim++;
+		m_numCompleted ++;
+		TrialNumber++;
+		CEnvironment::Instance()->outputMessage("-----------------------------------------------------");
+		XTargetOffset = m_paramsFile->getInteger(CFG_TARGET_OFFSET);
+		gotoFixation();
+
+}
