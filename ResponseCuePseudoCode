@@ -93,7 +93,7 @@ case RESPONSE_CUE:
           m_response_cue->show();
       }
       //if invalid trial and cue was to the right
-      else if (TrialType == 1 && CueDirection == 1) {
+      else if (TrialType == 0 && CueDirection == 1) {
         //show response cue to the left
           ResponseCueDirection == -1
           m_response_cue->pxSetPosition(X,Y);
@@ -144,7 +144,7 @@ case RESPONSE_CUE:
           m_response_cue->show();
       }
       //if invalid trial and cue was to the right
-      else if (TrialType == 1 && CueDirection == 1) {
+      else if (TrialType == 0 && CueDirection == 1) {
         //show response cue to the left
           ResponseCueDirection == -1
           m_response_cue->pxSetPosition(X,Y);
@@ -170,6 +170,8 @@ case RESPONSE_CUE:
           m_response_cue->show();
       }
   }
+  //repeated 2 times?
+  
   // when the time for the cue is over go to the next state 
 		else if ((m_timercue.isExpired()) && (gate==1))
 		{
@@ -371,3 +373,57 @@ case RESPONSE_CUE:
 				
 		}
 	}
+	
+	
+void ExperimentBody::eventJoypad()
+{
+	// activate the joypad only in the state calibration	
+
+	if (m_state == STATE_TESTCALIBRATION) 
+	{				
+
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_UP)) // moving the cursor up
+		{
+			yPos = yPos + Increment; //position of the cross
+		}
+			
+		else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_DOWN)) // moving the cursor down
+		{	
+			yPos = yPos - Increment;
+		}
+		
+		else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_RGHT)) // moving the cursor to the right
+		{
+			xPos = xPos + Increment;
+
+		}
+
+		else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_LEFT)) // moving the cursor to the left
+		{
+			xPos = xPos - Increment;	
+		}
+				
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // finalize the response
+		{
+			//CEnvironment::Instance()->outputMessage("RsponseFinalize event Joypad");
+			ResponseFinalize = 1; // click the left botton to finalize the response (RIGHT?)
+		}
+	}
+	if (STATE_RESPONSE)
+	{
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // location of T1 identified
+		//need to change to up
+		{
+			WAIT_RESPONSE = 1;
+			// get the time of the response here
+			ResponseTime =  m_timerExp.getTime();
+		}
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_L1))
+		//need to change to down
+		{
+			WAIT_RESPONSE = 1;
+			// get the time of the response here
+			ResponseTime =  m_timerExp.getTime();
+		}
+	}
+}
