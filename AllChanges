@@ -586,7 +586,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			m_timerisi.start(CueTargetTime);
 			m_cue->hide();
 			m_neutralcue->hide();
-      m_fixation->pxSetPosition(X,Y);
+      			m_fixation->pxSetPosition(X,Y);
 			m_fixation->show();
 			gate = 0;
 			//get the time when the cue disappears
@@ -596,7 +596,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 		break;
 	
 	// STATE_TARGET: present the target
-	//              go to the next state and wait for subject response
+	// go to the next state and wait for subject response
 	//THINGS TO CHANGE: we need two targets.  we need a variable for target orientation.  we need an occluder of different sizes
 	//to put in front of the image.  we need two options for the location of each bar.  we need to keep track of where it is.
 	case STATE_TARGET:
@@ -840,55 +840,53 @@ case RESPONSE_CUE:
 		}
 	}		
 ///////////////////////////////////////////////////////////////////////////////////
-//NOT UPDATED!  WHERE IS THIS CODE?
 void ExperimentBody::eventJoypad()
 {
 	// activate the joypad only in the state calibration	
-
-			//NO NEED TO CHANGE
-			if (m_state == STATE_TESTCALIBRATION) 
-			{				
-
-				if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_UP)) // moving the cursor up
-				{
-					yPos = yPos + Increment; //position of the cross
-				}
+ 	if (m_state == STATE_TESTCALIBRATION) 
+	{				
+ 		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_UP)) // moving the cursor up
+		{
+			yPos = yPos + Increment; //position of the cross
+		}
 			
-				else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_DOWN)) // moving the cursor down
-				{	
-					yPos = yPos - Increment;
-				}
+		else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_DOWN)) // moving the cursor down
+		{	
+			yPos = yPos - Increment;
+		}
 		
-				else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_RGHT)) // moving the cursor to the right
-				{
-					xPos = xPos + Increment;
-
-				}
-
-				else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_LEFT)) // moving the cursor to the left
-				{
-					xPos = xPos - Increment;
+		else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_RGHT)) // moving the cursor to the right
+		{
+			xPos = xPos + Increment;
+ 		}
+ 		else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_LEFT)) // moving the cursor to the left
+		{
+			xPos = xPos - Increment;	
+		}
 				
-				}
-				
-				if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // finalize the response
-				{
-					//CEnvironment::Instance()->outputMessage("RsponseFinalize event Joypad");
-						ResponseFinalize = 1; // click the left botton to finalize the response
-
-				}
-		   }
-			//WE NEED TO KEEP TRACK OF RESPONSES AND KEEP TRACK OF WHAT TYPE OF TRIAL THE RESPONSE WAS IN
-			if (STATE_RESPONSE)
-			{
-				//WE'RE USING UP AND DOWN BUTTONS INSTEAD OF R1 AND L1
-				if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // location of T1 identified
-				{
-					WAIT_RESPONSE = 1;
-					// get the time of the response here
-					ResponseTime =  m_timerExp.getTime();
-				}
-			}
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // finalize the response
+		{
+			//CEnvironment::Instance()->outputMessage("RsponseFinalize event Joypad");
+			ResponseFinalize = 1; // click the left botton to finalize the response (RIGHT?)
+		}
+	}
+	if (STATE_RESPONSE)
+	{
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // location of T1 identified
+		//need to change to up
+		{
+			WAIT_RESPONSE = 1;
+			// get the time of the response here
+			ResponseTime =  m_timerExp.getTime();
+		}
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_L1))
+		//need to change to down
+		{
+			WAIT_RESPONSE = 1;
+			// get the time of the response here
+			ResponseTime =  m_timerExp.getTime();
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////////////////////
       void ExperimentBody::gotoFixation() 
