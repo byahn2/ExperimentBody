@@ -611,10 +611,6 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			m_fixation->pxSetPosition(X,Y);
 			m_fixation->show();
 			
-	Changed	---->	TARGET_LEFT_ORIENTATION -> GETORENTATION();//INT
-			TARGET_RIGHT_ORIENTATION -> GETORENTATION();//INT
-			TARGET_SIZE -> GETTARGETSIZE();//INT, PERCENTAGE
-			
 			
 			if (debug==1)
 			{
@@ -627,15 +623,25 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			
 		   	SHOW_TARGET = 1;
 			//m_target->pxSetPosition(X+XTargetOffset, Y);//LEFT AND RIGHT
-		---->	M_LEFTtarget->pxSetPosition(Position,position)
-			M_RIGTHtarget->pxSetPosition(Position,Position)
-			M_Lefttarget -> SET LEFT TARGET ORIENTATION
-			M_Righttarget -> SET RIGHT TARGET ORITATION
+			
+			
+			m_Ltarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)//*
+			
+			m_Rtarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)
+			
+			if(LGapDirection == 1){
+				m_Ltarget -> degSetAngle(180);
+			}
+			if(RGapDirection == 1){
+				m_Rtarget -> degSetAngle(180);
+			}//*
 			
 			
 			
-		---->	M_Lefttarget->show();
-			M_RightTarget->show();
+			
+			
+			m_Ltarget->show();//*
+			m_RTarget->show();
 			
 			
 			TimeTargetON = m_timerExp.getTime();
@@ -651,7 +657,8 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			{ // go to the next state
 			
 			m_state = STATE_RESPONSE_CUE;
-		---->	m_target->hide();//2 target should be hided
+		---->	m_Ltarget->hide();//2 target should be hided
+			m_Rtarget->hide();//2 target should be hided
     m_fixation->pxSetPosition(X,Y);
 		m_fixation->show();
 
@@ -1035,9 +1042,24 @@ void ExperimentBody::saveData()
 		storeTrialVariable("TimeCueOFF", TimeCueOFF);
 		storeTrialVariable("TimeTargetON", TimeTargetON);
 		storeTrialVariable("TimeTargetOFF", TimeTargetOFF);
-		//STORETRIALVARIABLE("CORRECTRESPONSE", CORRECT);
-		//STORETRIALVARIABLE("GAPSIZE", GAPSIZE);
-		//WE NEED TO STORE IF RESPONSE WAS CORRECT, IF TRIAL WAS VALID OR INVALID, AND THE SIZE OF THE GAP
+    
+
+		storeTrialVariable("TrialType", TrialType);//*
+		storeTrialVariable("CueDirection", CueDirection);//*
+    		storeTrialVariable("GapSize", GapSize);//*
+    
+    		storeTrialVariable("CorrectAnswer", CorrectAnswer);//*
+    		storeTrialVariable("AnswerDirection", AnswerDirection);//*
+    		storeTrialVariable("Correctness", isCorrect);//*
+    
+    
+    
+		//STORETRIALVARIABLE("CORRECTRESPONSE", CORRECT); done
+		//STORETRIALVARIABLE("GAPSIZE", GAPSIZE); done
+		//WE NEED TO STORE IF RESPONSE WAS CORRECT, IF TRIAL WAS VALID OR INVALID, AND THE SIZE OF THE GAP done
+
+
+
 
 		//WE CAN KEEP THIS IF WE WANT, BUT WE NEED TO ADD, GAP SIZE, CORRECT, INCORRECT
 		CEnvironment::Instance()->outputMessage("Cue target timing: %.2i", CueTargetTime);
@@ -1063,12 +1085,6 @@ void ExperimentBody::saveData()
 		}
 
 		
-		//trial type 
-		storeTrialVariable("TrialType", TrialType);
-		// cue type 
-		storeTrialVariable("CueType", CueDirection);
-		// cue target timing 
-		storeTrialVariable("CueTargetTiming", CueTargetTime);
 		
 		// save size of stimuli in px
 		//HERE WE WANT TO SAVE THE SIZE OF THE GAP, NOT THE TARGET
@@ -1119,6 +1135,7 @@ void ExperimentBody::saveData()
 
 }
 ///////////////////////////////////////////////////////////////////////////////////
+
 void ExperimentBody::loadSession()
 {
 	//read stmuli from the stim list 
@@ -1149,16 +1166,24 @@ void ExperimentBody::loadSession()
 
 		in1>>tempInt; // cue direction
 		CueDirectionList.push_back(tempInt);
+    
+    in1>>tempInt; // left gap direction
+		LGapDirectionList.push_back(tempInt);
+    
+    in1>>tempInt; // right gap direction
+		RGapDirectionList.push_back(tempInt);
+    
+    in1>>tempInt; // gap size
+		GapSizeList.push_back(tempInt);
 		
 		in1>>tempInt; // trial type
 		TrialTypeList.push_back(tempInt);
-		
-	    in1>>tempInt; // timing
-		CueTargetTimingList.push_back(tempInt);
+    
+    in1>>tempStr;//discard *
 
 	}
-
 }
+
 ///////////////////////////////////////////////////////////////////////////////////
 void ExperimentBody::loadProgress()
 {
@@ -1180,7 +1205,7 @@ void ExperimentBody::loadProgress()
 
 	bool empty = true;
 
-	while(in1.peek() != EOF)
+	while(in1.peek() != EOF)//EOF = end of file
 	{
 		in1>>discard;//discard date line
 		in1>>tempInt1;
