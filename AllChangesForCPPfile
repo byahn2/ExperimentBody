@@ -657,19 +657,23 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			{ // go to the next state
 			
 			m_state = STATE_RESPONSE_CUE;
-		---->	m_Ltarget->hide();//2 target should be hided
+			m_Ltarget->hide();//2 target should be hided
 			m_Rtarget->hide();//2 target should be hided
-    m_fixation->pxSetPosition(X,Y);
+			
+			
+   		m_fixation->pxSetPosition(X,Y);
 		m_fixation->show();
 
 			
 			
-			//CEnvironment::Instance()->outputMessage("State Response Cue");
+		//CEnvironment::Instance()->outputMessage("State Response Cue");
 		// set the time before the target appears after the cue (based on the ISI --> take this from the parameter file)
 		//m_timerisi.start(m_paramsFile->getInteger(CFG_CUE_TARGET_TIME));
-			CEnvironment::Instance()->outputMessage("ISI time: %.2i", CueTargetTime);
+		
+		CEnvironment::Instance()->outputMessage("ISI time: %.2i", CueTargetTime);
 		m_fixation->pxSetPosition(X,Y);
 		m_fixation->show();
+		
 		gate = 0;
 			
 			}
@@ -680,8 +684,13 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			{
 			m_fixation->pxSetPosition(X,Y);
 			m_fixation->show();			
-			m_target->pxSetPosition(X+XTargetOffset, Y);//also should be 2 targets
-			m_target->show();
+			
+			m_Ltarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)//*
+			m_Rtarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)
+			
+			m_Ltarget->show();//*
+			m_RTarget->show();
+			
 			}
 
 	
