@@ -1,0 +1,47 @@
+void ExperimentBody::loadSession()
+{
+	//read stmuli from the stim list 
+	// [ stimList contains information about whether the cue indicates left or right and whether it is valid, invalid or neutral]
+	ostringstream fstr1;
+	fstr1<<"StimList.txt";
+	
+	string tempStr;
+	int tempInt;
+	ifstream in1(fstr1.str().c_str());
+
+	if(!in1.is_open())
+	{
+		CEnvironment::Instance()->outputMessage(CEnvironment::ENV_MSG_ERROR, "Session data file (%sStimList.txt) could not be opened.  Please check that the file exists.", m_paramsFile->getString(CFG_SUBJECT_NAME));
+		declareFinished();
+
+	}
+	
+	// the first number on each sequence in the StimList indicates the trial number
+	// the second number indicates whether the cue indicates left or right (-1= left 1= right)
+	// the third number indicats whether the cue is valid invalid or neutral (valid = 1 invalid = 0 neutral = 2 catch = 3)
+
+	while(in1.peek() != EOF)
+	{
+		in1>>tempStr;//discard *
+
+		in1>>tempInt;// discard (trialnumber)
+
+		in1>>tempInt; // cue direction
+		CueDirectionList.push_back(tempInt);
+    
+    in1>>tempInt; // left gap direction
+		LGapDirectionList.push_back(tempInt);
+    
+    in1>>tempInt; // right gap direction
+		RGapDirectionList.push_back(tempInt);
+    
+    in1>>tempInt; // gap size
+		GapSizeList.push_back(tempInt);
+		
+		in1>>tempInt; // trial type
+		TrialTypeList.push_back(tempInt);
+    
+    in1>>tempStr;//discard *
+
+	}
+}
