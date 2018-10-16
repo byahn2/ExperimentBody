@@ -119,6 +119,7 @@ private:
 	bool SHOW_TARGET;
 	bool isCorrect;
 	bool isAnswered;
+	
 
 
 	vector<int> TrialTypeList;
