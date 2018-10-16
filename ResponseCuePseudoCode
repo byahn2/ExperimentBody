@@ -164,8 +164,11 @@ case RESPONSE_CUE:
           m_response_cue->show();
       }
       else if (TrialType == 2) {
-          //use a random number generator
-          ResponseCueDirection == 1 or -1;
+          //use a random number generator 
+	  //ResponseCueDirection == 1 or -1;
+	  
+	  ResponseCueDirection == CueDirection; //?
+	  
           m_response_cue --> pxSetPosition(X,Y);
           m_response_cue->show();
       }
@@ -209,38 +212,38 @@ case RESPONSE_CUE:
 		
 case STATE_RESPONSE:
 		
-		int CorrectResponse = 0;
+		CorrectAnswer = 0;
 		if (TrailType == 0 && CueDirection == -1)
 		{
-			CorrectResponse = RGapDirection;
+			CorrectAnswer = RGapDirection;
 		}
 		
 		else if (TrailType == 0 && CueDirection == 1)
 		{
-			CorrectResponse = LGapDirection;
+			CorrectAnswer = LGapDirection;
 		}
 		
 		else if (TrailType == 1 && CueDirection == -1)
 		{
-			CorrectResponse = LGapDirection;
+			CorrectAnswer = LGapDirection;
 		}
 		
 		else if (TrailType == 1 && CueDirection == 1)
 		{
-			CorrectResponse = RGapDirection;
+			CorrectAnswer = RGapDirection;
 		}
 		
 		else if (TrailType == 2 && CueDirection == -1)
 		{
-			CorrectResponse = LGapDirection;
+			CorrectAnswer = LGapDirection;
 		}
 		
 		else if (TrailType == 2 && CueDirection == 1)
 		{
-			CorrectResponse = RGapDirection;
+			CorrectAnswer = RGapDirection;
 		}
 		
-		if (Response == CorrectResponse)
+		if (AnswerDirection == CorrectAnswer)
 			isCorrect = true;
 		else
 			isCorrect = false;
@@ -495,11 +498,11 @@ void ExperimentBody::eventJoypad()
 			// get the time of the response here
 			ResponseTime =  m_timerExp.getTime();
 			
-			if(Answer == false)
+			if(isAnswered == false)
 			// RECORD ONLY THE FIRST ENTRY
 			{
-				int Response = 1; //1 for pressing up, 0 for down
-				Answer = true; 
+				AnswerDirection = 1; //1 for pressing up, 0 for down
+				isAnswered = true; 
 			}
 			
 		}
@@ -510,10 +513,10 @@ void ExperimentBody::eventJoypad()
 			// get the time of the response here
 			ResponseTime =  m_timerExp.getTime();
 			
-			if(Answer == false)
+			if(isAnswered == false)
 			{ 
-				int Response = 0; //1 for pressing up, 0 for down
-				Answer = true;
+				AnswerDirection = 0; //1 for pressing up, 0 for down
+				isAnswered = true;
 			}
 			
 		}
