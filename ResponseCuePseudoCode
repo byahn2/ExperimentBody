@@ -170,7 +170,7 @@ case RESPONSE_CUE:
           m_response_cue->show();
       }
   }
-  //repeated 2 times?
+ 
   
   // when the time for the cue is over go to the next state 
 		else if ((m_timercue.isExpired()) && (gate==1))
@@ -202,6 +202,88 @@ case RESPONSE_CUE:
 		
 		}
 
+		break;
+		
+		
+		
+		
+case STATE_RESPONSE:
+		
+		int CorrectResponse = 0;
+		if (TrailType == 0 && CueDirection == -1)
+		{
+			CorrectResponse = RGapDirection;
+		}
+		
+		else if (TrailType == 0 && CueDirection == 1)
+		{
+			CorrectResponse = LGapDirection;
+		}
+		
+		else if (TrailType == 1 && CueDirection == -1)
+		{
+			CorrectResponse = LGapDirection;
+		}
+		
+		else if (TrailType == 1 && CueDirection == 1)
+		{
+			CorrectResponse = RGapDirection;
+		}
+		
+		else if (TrailType == 2 && CueDirection == -1)
+		{
+			CorrectResponse = LGapDirection;
+		}
+		
+		else if (TrailType == 2 && CueDirection == 1)
+		{
+			CorrectResponse = RGapDirection;
+		}
+		
+		if (Response == CorrectResponse)
+			isCorrect = true;
+		else
+			isCorrect = false;
+		
+		
+		if (!(m_timerhold.isExpired()))
+		{
+			// continue to stabilize the fixation marker
+			if (debug==1)
+			{
+				X = 0;
+				Y = 0;
+			}
+			m_fixation->pxSetPosition(X,Y);
+			m_fixation->show();
+		}
+
+		if ((m_timerhold.isExpired()) && (WAIT_RESPONSE == 0))
+		{
+			// response is not given
+			ResponseTime = 0;	
+			// hide all the objects 
+			hideAllObjects();
+			m_target->hide();
+			m_fixation->hide();
+			//m_box->hide();
+			
+			endTrial(); //NO DEFINATION FOR ENDTRAIL
+			saveData();				 
+		}
+			
+		else if (WAIT_RESPONSE == 1)
+		{
+			// hide all the objects 
+			hideAllObjects();
+			m_target->hide();
+			m_fixation->hide();
+			//m_box->hide();
+			
+			endTrial();
+			saveData();		
+		}	
+            	
 		break;
 
       
@@ -248,84 +330,77 @@ case RESPONSE_CUE:
 		CueDirection = CueDirectionList[m_curStim+1];
     //Make sure that Target time doesn't change?
 		CueTargetTime = CueTargetTimingList[m_curStim+1];
+		
+		//NEED TO ADD PARAMETERS IN SOURCE FILES ALSO:
+		
+		
+		LGapDirection = LGapDirectionList[m_curStim+1]; //LGAPDIRECTION & L GAP DIRECTION LIST
+		RGapDirection = RGapDirectionList[m_curStim+1]; //LGAPDIRECTION & L GAP DIRECTION LIST
+		
+		
 		// valid trial
 		if (TrialType == 1) 
 		{
-	      NumberValidTrials++;
-		//SET CUE ANGLE?
-		if (CueDirection==-1)
-		{
-		CEnvironment::Instance()->outputMessage("Valid trial - cue direction to the left ");
-		// note: the cue originally points to the left, when the cue points right, it need to be rotated
-		m_cue->degSetAngle(0);
-    m_response_cue->degSetAngle(0);
-		}
-		if (CueDirection==1)
-		{
-		CEnvironment::Instance()->outputMessage("Valid trial - cue direction to the right ");
-		m_cue->degSetAngle(180);
-    m_response_cue->degSetAngle(180);
-		}		
-		XTargetOffset = XTargetOffset * CueDirection;		
+	      		NumberValidTrials++;
+			//SET CUE ANGLE?
+			if (CueDirection==-1)
+			{
+				CEnvironment::Instance()->outputMessage("Valid trial - cue direction to the left ");
+				// note: the cue originally points to the left, when the cue points right, it need to be rotated
+				m_cue->degSetAngle(0); //NEED TO CHANGE DEGREE (TO 135 AND 315?)
+    				m_response_cue->degSetAngle(0);
+			}
+			if (CueDirection==1)
+			{
+				CEnvironment::Instance()->outputMessage("Valid trial - cue direction to the right ");
+				m_cue->degSetAngle(180);
+  				m_response_cue->degSetAngle(180);
+			}		
+			XTargetOffset = XTargetOffset * CueDirection;		
 		}
 		// invalid trial
 		else if (TrialType == 0)
 		{
-		NumberInvalidTrials++;
-		if (CueDirection==-1)
-		{
-		CEnvironment::Instance()->outputMessage("Invalid trial - cue direction to the left ");
-		m_cue->degSetAngle(0);
-    m_response_cue->degSetAngle(180);
-		}
-		if (CueDirection==1)
-		{
-		CEnvironment::Instance()->outputMessage("Invalid trial - cue direction to the right ");
-		m_cue->degSetAngle(180);
-    m_response_cue->degSetAngle(0);
-		}
+			NumberInvalidTrials++;
+			if (CueDirection==-1)
+			{
+				CEnvironment::Instance()->outputMessage("Invalid trial - cue direction to the left ");
+				m_cue->degSetAngle(0);
+  				m_response_cue->degSetAngle(180);
+			}
+			if (CueDirection==1)
+			{
+				CEnvironment::Instance()->outputMessage("Invalid trial - cue direction to the right ");
+				m_cue->degSetAngle(180);
+   				m_response_cue->degSetAngle(0);
+			}
 		
-		XTargetOffset = XTargetOffset * -CueDirection;	
+			XTargetOffset = XTargetOffset * -CueDirection;	
 	
 		}
 		// neutral trials (a neutral cue is shown)
 		// target to the right and left??? what does this mean
 		//PROBABLY HAVE TO CHANGE THIS A BIT
+		
     //randomly generate the direction of the neutral response cue
 		else if (TrialType == 2)
 		{
-	    NumberNeutralTrials++;
-		if (CueDirection==-1)
-		{
-		CEnvironment::Instance()->outputMessage("Neutral trial - target to the right ");
-		m_cue->degSetAngle(0);
-		}
-		if (CueDirection==1)
-		{
-		CEnvironment::Instance()->outputMessage("Neutral trial - target to the left");
-		m_cue->degSetAngle(180);
+	    		NumberNeutralTrials++;
+			if (CueDirection==-1)
+			{
+				CEnvironment::Instance()->outputMessage("Neutral trial - target to the left");
+			}
+			else if (CueDirection==1)
+			{
+				CEnvironment::Instance()->outputMessage("Neutral trial - target to the right");
+			}
+			
+			m_cue->degSetAngle(0);
+			m_cue->degSetAngle(180); //APPEAR ON BOTH DIRECTION, NOT SURE
+		
+			XTargetOffset = XTargetOffset * CueDirection;	
 		}
 		
-		XTargetOffset = XTargetOffset * -CueDirection;	
-		}
-		// catch trial (no target appears)
-		else if (TrialType == 3)
-		{
-		if (CueDirection==-1)
-		{
-		CEnvironment::Instance()->outputMessage("Catch trial - cue direction to the left ");
-		m_cue->degSetAngle(0);
-		}
-		if (CueDirection==1)
-		{
-		CEnvironment::Instance()->outputMessage("Catch trial - cue direction to the right ");
-		m_cue->degSetAngle(180);
-		}
-		if (CueDirection==3)
-		{
-		CEnvironment::Instance()->outputMessage("Catch trial - cue direction neutral ");
-		}
-		}
 	
 		}
 
@@ -336,16 +411,13 @@ case RESPONSE_CUE:
 
 
 
-	if (STATE_RESPONSE)
-	{
-		//WE'RE USING UP AND DOWN BUTTONS INSTEAD OF R1 AND L1
-		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // location of T1 identified
-		{
-			WAIT_RESPONSE = 1;
-			// get the time of the response here
-			ResponseTime =  m_timerExp.getTime();
+	
+		
 			
-			INT RESPONSE = WHATEVER THEY INPUT;
+		
+		
+		
+			/*INT RESPONSE = WHATEVER THEY INPUT;
 			IF (RESPONSE_TYPE == 0 && CUEDIRECTION == -1) {
 				CORRECT_RESPONSE = TARGET2.GET(GAPDIRECTION)
 			}
@@ -369,10 +441,10 @@ case RESPONSE_CUE:
 				RETURN CORRECT;
 			} ELSE IF (RESPONSE != CORRECT RESPONSE) {
 				RETURN INCORRECT;
-			}
+			}*/
 				
-		}
-	}
+		
+	
 	
 	
 void ExperimentBody::eventJoypad()
@@ -409,21 +481,41 @@ void ExperimentBody::eventJoypad()
 			ResponseFinalize = 1; // click the left botton to finalize the response (RIGHT?)
 		}
 	}
+	
+	
 	if (STATE_RESPONSE)
 	{
-		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // location of T1 identified
-		//need to change to up
+		AnswerDirection = -1; //INITIALIZE RESPONSE
+		isAnswered = false; //RECORD ANSWER STATUS
+		//WE'RE USING UP AND DOWN BUTTONS INSTEAD OF R1 AND L1
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_UP)) // location of T1 identified
+		//AlSO NEED TO KNOW WHAT THE ACTUAL PARAMETER OF "UP" IS
 		{
 			WAIT_RESPONSE = 1;
 			// get the time of the response here
 			ResponseTime =  m_timerExp.getTime();
+			
+			if(Answer == false)
+			// RECORD ONLY THE FIRST ENTRY
+			{
+				int Response = 1; //1 for pressing up, 0 for down
+				Answer = true; 
+			}
+			
 		}
-		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_L1))
-		//need to change to down
+		else if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_DOWN)) // location of T1 identified
+		//AlSO NEED TO KNOW WHAT THE ACTUAL PARAMETER OF "DOWN" IS
 		{
 			WAIT_RESPONSE = 1;
 			// get the time of the response here
 			ResponseTime =  m_timerExp.getTime();
+			
+			if(Answer == false)
+			{ 
+				int Response = 0; //1 for pressing up, 0 for down
+				Answer = true;
+			}
+			
 		}
 	}
 }
