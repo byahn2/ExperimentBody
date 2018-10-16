@@ -16,9 +16,6 @@ CPP FILE:
 			m_fixation->pxSetPosition(X,Y);
 			m_fixation->show();
 			
-	Changed	---->	TARGET_LEFT_ORIENTATION -> GETORENTATION();//INT
-			TARGET_RIGHT_ORIENTATION -> GETORENTATION();//INT
-			TARGET_SIZE -> GETTARGETSIZE();//INT, PERCENTAGE
 			
 			
 			if (debug==1)
@@ -32,10 +29,10 @@ CPP FILE:
 			
 		   	SHOW_TARGET = 1;
 			//m_target->pxSetPosition(X+XTargetOffset, Y);//LEFT AND RIGHT
-		---->	M_LEFTtarget->pxSetPosition(Position,position)
-			M_RIGTHtarget->pxSetPosition(Position,Position)
-			M_Lefttarget -> SET LEFT TARGET ORIENTATION
-			M_Righttarget -> SET RIGHT TARGET ORITATION
+		---->	m_Ltarget->pxSetPosition(Position,position)
+			m_Rtarget->pxSetPosition(Position,Position)
+			m_Lefttarget -> SET LEFT TARGET ORIENTATION
+			m_Righttarget -> SET RIGHT TARGET ORITATION
 			
 			
 			
