@@ -65,6 +65,7 @@ void ExperimentBody::initialize()
 	disable(CExperiment::EIS_NOTRACK_ICON);
 	disable(CExperiment::EIS_STAT1);
 	
+	
 	// set the distance of the target from the gaze (NO CHANGES)
 	XTargetOffset = m_paramsFile->getInteger(CFG_TARGET_OFFSET);
 	debug = m_paramsFile->getInteger(CFG_DEBUG);
