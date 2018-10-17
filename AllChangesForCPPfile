@@ -373,12 +373,12 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 	Y = 0;
 	}
 	
-	m_box_35->pxSetPosition(X+XTargetOffset, Y);
-	m_box_35->show();
+	m_box->pxSetPosition(X+XTargetOffset, Y);
+	m_box->show();
 // 	float x;
 // 	float y;
 // 	float dist;
-	//m_box_35->show();
+	//m_box->show();
 	//m_whitecross->show();
  
 	switch (m_state) {
@@ -413,7 +413,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 	//NO NEED TO CHANGE ANYTHING IN THIS SECTION
 	case STATE_TESTCALIBRATION:
 		
-		m_box_35->hide();
+		m_box->hide();
 		if (!m_timerCheck.isExpired())
 		{
 			//NO CCONVERTER IN EYERIS
@@ -573,8 +573,8 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			}			
 			else
 			{
-			m_cue->pxSetPosition(X,Y);
-			m_cue->show();	
+				m_cue->pxSetPosition(X,Y);
+				m_cue->show();	
 			}
 		}
 		// when the time for the cue is over go to the next state 
@@ -590,6 +590,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 	       CEnvironment::Instance()->outputMessage("Cue target timing: %.2i", CueTargetTime);
 
 			m_timerisi.start(CueTargetTime);
+			TimeISI1ON = m_timerExp.getTime();
 			m_cue->hide();
 			m_neutralcue->hide();
       			m_fixation->pxSetPosition(X,Y);
@@ -626,6 +627,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 
 			if (m_timerisi.isExpired() && (gate==0))
 			{
+			TimeISI1OFF = m_timerExp.getTime();
 			
 		   	SHOW_TARGET = 1;
 			//m_target->pxSetPosition(X+XTargetOffset, Y);//LEFT AND RIGHT
@@ -667,18 +669,19 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			m_Rtarget->hide();//2 target should be hided
 			
 			
-   		m_fixation->pxSetPosition(X,Y);
-		m_fixation->show();
+   			m_fixation->pxSetPosition(X,Y);
+			m_fixation->show();
 
 			
 			
-		//CEnvironment::Instance()->outputMessage("State Response Cue");
-		// set the time before the target appears after the cue (based on the ISI --> take this from the parameter file)
-		//m_timerisi.start(m_paramsFile->getInteger(CFG_CUE_TARGET_TIME));
+			CEnvironment::Instance()->outputMessage("State Response Cue");
+			// set the time before the target appears after the cue (based on the ISI --> take this from the parameter file)
+			m_timerisi.start(m_paramsFile->getInteger(CFG_CUE_TARGET_TIME));
+			TimeISI2ON = m_timerExp.getTime();
 		
-		CEnvironment::Instance()->outputMessage("ISI time: %.2i", CueTargetTime);
-		m_fixation->pxSetPosition(X,Y);
-		m_fixation->show();
+			CEnvironment::Instance()->outputMessage("ISI time: %.2i", CueTargetTime);
+			m_fixation->pxSetPosition(X,Y);
+			m_fixation->show();
 		
 		gate = 0;
 			
@@ -688,14 +691,14 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			//If timer isn't expired, continue to show the target
 			else if ((gate==1) && (!m_timertarget.isExpired()))
 			{
-			m_fixation->pxSetPosition(X,Y);
-			m_fixation->show();			
-			
-			m_Ltarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)//*
-			m_Rtarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)
-			
-			m_Ltarget->show();//*
-			m_RTarget->show();
+				m_fixation->pxSetPosition(X,Y);
+				m_fixation->show();			
+
+				m_Ltarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)//*
+				m_Rtarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)
+
+				m_Ltarget->show();//*
+				m_RTarget->show();
 			
 			}
 
@@ -719,9 +722,8 @@ case RESPONSE_CUE:
 			  Y = 0;
 			}
 			// show the cue at fixation and hide the fixation point (don't hide fixation)
-			//m_fixation->hide();
 			//records when fixation breaks
-			TimeFixationOFF = m_timerExp.getTime();
+			TimeISI2OFF = m_timerExp.getTime();
       
       
       //if invalid trial and cue was to the left
@@ -758,7 +760,7 @@ case RESPONSE_CUE:
           m_response_cue->show();
       }
       // time for cue presentation
-			TimeCueON = m_timerExp.getTime();
+			TimeResponseCueON = m_timerExp.getTime();
 
 			gate = 1;
 			// set the time for the cue 
@@ -824,7 +826,7 @@ case RESPONSE_CUE:
 			m_response_cue->hide();
 			m_fixation->pxSetPosition(X,Y);
 			m_fixation->show();
-			TimeCueOFF = m_timerExp.getTime();
+			TimeResponseCueOFF = m_timerExp.getTime();
 		
 		}
 
@@ -892,6 +894,7 @@ void ExperimentBody::eventJoypad()
 			ResponseFinalize = 1; // click the left botton to finalize the response (RIGHT?)
 		}
 	}
+	//WHERE IS THIS CODE?
 	if (STATE_RESPONSE)
 	{
 		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // location of T1 identified
@@ -1057,6 +1060,12 @@ void ExperimentBody::saveData()
 		storeTrialVariable("TimeCueOFF", TimeCueOFF);
 		storeTrialVariable("TimeTargetON", TimeTargetON);
 		storeTrialVariable("TimeTargetOFF", TimeTargetOFF);
+		storeTrialVariable("TimeResponseCueON", TimeResponseCueON);
+		storeTrialVariable("TimeResponseCueOFF", TimeResponseCueOFF);
+		storeTrialVariable("TimeISI1ON", TimeISI1ON);
+		storeTrialVariable("TimeISI1OFF", TimeISI1OFF);
+		storeTrialVariable("TimeISI2ON", TimeISI2ON);
+		storeTrialVariable("TimeISI2OFF", TimeISI2OFF);
     
 
 		storeTrialVariable("TrialType", TrialType);//*
@@ -1066,15 +1075,7 @@ void ExperimentBody::saveData()
     		storeTrialVariable("CorrectAnswer", CorrectAnswer);//*
     		storeTrialVariable("AnswerDirection", AnswerDirection);//*
     		storeTrialVariable("Correctness", isCorrect);//*
-    
-    
-    
-		//STORETRIALVARIABLE("CORRECTRESPONSE", CORRECT); done
-		//STORETRIALVARIABLE("GAPSIZE", GAPSIZE); done
-		//WE NEED TO STORE IF RESPONSE WAS CORRECT, IF TRIAL WAS VALID OR INVALID, AND THE SIZE OF THE GAP done
-
-
-
+		
 
 		//WE CAN KEEP THIS IF WE WANT, BUT WE NEED TO ADD, GAP SIZE, CORRECT, INCORRECT
 		CEnvironment::Instance()->outputMessage("Cue target timing: %.2i", CueTargetTime);
