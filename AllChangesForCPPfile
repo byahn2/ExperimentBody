@@ -41,6 +41,12 @@ void ExperimentBody::initialize()
 	m_neutralcue->pxSetPosition(0,0);
 	m_neutralcue->hide();
 	
+	m_response_cue = addObject(new CImagePlane("images/cue.tga"));
+	m_response_cue->enableTrasparency(true);
+	m_response_cue->pxSetSize(m_paramsFile->getInteger(CFG_CUE_SIZE),m_paramsFile->getInteger(CFG_CUE_SIZE));
+	m_response_cue->pxSetPosition(0,0);
+	m_response_cue->hide();
+	
   m_box_35 = addObject(new CImagePlane("images/box_35.tga"));
 	m_box_35->enableTrasparency(true);
 	m_box_35->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
