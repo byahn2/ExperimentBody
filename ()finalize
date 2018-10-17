@@ -1,1 +1,31 @@
 
+// write the progress file
+void ExperimentBody::finalize() ///(NO CHANGE)
+{
+	// write progress
+	if(m_numCompleted > 0)//check to see that some experiments have been conducted
+	{
+		char LocalDate[1024];
+		time_t t = time(NULL);
+		strftime(LocalDate, 1024, "%Y-%m-%d-%H-%M-%S", localtime(&t));
+
+		ostringstream fstr1;
+		fstr1<< "Data\\"<<m_paramsFile->getString(CFG_SUBJECT_NAME)<<"\\"<<m_paramsFile->getString(CFG_SUBJECT_NAME) <<"Progress.txt";
+	
+		ofstream out1(fstr1.str().c_str(), ios::app);
+
+		if(!out1.is_open())
+		{
+			CEnvironment::Instance()->outputMessage(CEnvironment::ENV_MSG_ERROR, "Session data file (%sProgress.txt) could not be opened.  Please check that the file exists.", m_paramsFile->getString(CFG_SUBJECT_NAME));
+			CEnvironment::Instance()->outputMessage(CEnvironment::ENV_MSG_ERROR, "Index of last saved file: %i.", m_sessionEnd);
+			declareFinished();
+
+		}
+	    // If there were previous sessions/trials keep track of the last trial played in the list and start from there in the next session
+		out1<< "Recorded: " << LocalDate <<endl;
+		out1<< m_sessionBegin  << endl;
+		out1<< m_sessionEnd << endl;
+		
+	}
+
+}
