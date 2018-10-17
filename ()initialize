@@ -1,1 +1,83 @@
+void ExperimentBody::initialize()
+{		
+	CStabilizer::Instance()->enableSlowStabilization(true);
+	
+	
+	m_fixation = addObject(new CImagePlane("images/fixation.tga"));
+	m_fixation->enableTrasparency(true);
+    	m_fixation->pxSetSize(10,10);
+	m_fixation->pxSetPosition(0,0);
+	m_fixation->hide();
+	
+	//change in parameter file
+	m_cue = addObject(new CImagePlane("images/cue.tga"));
+	m_cue->enableTrasparency(true);
+	m_cue->pxSetSize(m_paramsFile->getInteger(CFG_CUE_SIZE),m_paramsFile->getInteger(CFG_CUE_SIZE));
+	m_cue->pxSetPosition(0,0);
+	m_cue->hide();
+	
+	m_neutralcue = addObject(new CImagePlane("images/neutralcue.tga"));
+	m_neutralcue->enableTrasparency(true);
+	m_neutralcue->pxSetSize(m_paramsFile->getInteger(CFG_CUE_SIZE),m_paramsFile->getInteger(CFG_CUE_SIZE));
+	m_neutralcue->pxSetPosition(0,0);
+	m_neutralcue->hide();
+	
+	m_box = addObject(new CImagePlane("images/box.tga"));
+	m_box->enableTrasparency(true);
+	m_box->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
+	m_box->pxSetPosition(0,0);
+	m_box->enableTrasparency(true);
+	m_box->hide();
 
+	// set the pixel increment for the test calibration procedure during the exp (NO CHANGES)
+	Increment = 1;
+	ResponseFinalize = 0;
+	xshift = 0;
+	yshift = 0;
+	xPos = 0;
+	yPos = 0;
+	TrialNumber = 1;
+	m_numTestCalibration = 0;
+	Curr_stim = 0;
+	CurrentRTValid = 0;
+	NumberValidTrials = 0;
+	CurrentRTInvalid = 0;
+	NumberInvalidTrials = 0;
+    	CurrentRTNeutral = 0;
+	NumberNeutralTrials = 0;
+	// set TestCalibration = 1 so that the experiment will start with a recalibration trial
+	TestCalibration = 1;
+	m_numCompleted  = 0;
+	
+	// crosses for the recalibration trials	 (NO CHANGES)
+	m_redcross = addObject(new CImagePlane("images/redcross.tga"));
+	m_redcross->enableTrasparency(true);
+	m_redcross->hide();
+	m_whitecross = addObject(new CImagePlane("images/whitecross.tga"));
+	m_whitecross->enableTrasparency(true);
+	m_whitecross->hide();	
+
+	//Load session data
+	loadSession();
+	loadProgress();
+
+	disable(CExperiment::EIS_PHOTOCELL);
+	disable(CExperiment::EIS_NOTRACK_ICON);
+	disable(CExperiment::EIS_STAT1);
+	
+	// set the distance of the target from the gaze (NO CHANGES)
+	XTargetOffset = m_paramsFile->getInteger(CFG_TARGET_OFFSET);
+	debug = m_paramsFile->getInteger(CFG_DEBUG);
+	
+	hideAllObjects();
+	m_state = STATE_LOADING;
+	m_timer.start(1000);
+
+	WAIT_RESPONSE = 1;
+	
+	/* Seed the random-number generator with current time so that
+    * the numbers will be different every time we run.*/
+    srand( (unsigned)time( NULL ) );
+
+
+}
