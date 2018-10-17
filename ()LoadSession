@@ -22,7 +22,7 @@ void ExperimentBody::loadSession()
 
 	while(in1.peek() != EOF)
 	{
-		in1>>tempStr;//discard *
+		//in1>>tempStr;//discard *
 
 		in1>>tempInt;// discard (trialnumber)
 
