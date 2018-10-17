@@ -12,4 +12,4 @@ float: YTargetOff//the vertical distance
 
 CSolidPlane: m_LTarget, m_RTarget//we need 2 target
 
-bool: isCorrect//whether the answer is correct, isAnswered//whether subject pressed button in certain time limit.
+bool: isCorrect//whether the answer is correct, isAnswered//whether subject has already made an answer.
