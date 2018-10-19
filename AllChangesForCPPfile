@@ -53,223 +53,13 @@ void ExperimentBody::initialize()
 	m_box->pxSetPosition(0,0);
 	m_box->enableTrasparency(true);
 	m_box->hide();
-	
-  m_box_35 = addObject(new CImagePlane("images/box_35.tga"));
-	m_box_35->enableTrasparency(true);
-	m_box_35->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_35->pxSetPosition(0,0);
-	m_box_35->enableTrasparency(true);
-	m_box_35->hide();
   
-  m_box_34 = addObject(new CImagePlane("images/box_34.tga"));
-	m_box_34->enableTrasparency(true);
-	m_box_34->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_34->pxSetPosition(0,0);
-	m_box_34->enableTrasparency(true);
-	m_box_34->hide();
-  
-  m_box_33 = addObject(new CImagePlane("images/box_33.tga"));
-	m_box_33->enableTrasparency(true);
-	m_box_33->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_33->pxSetPosition(0,0);
-	m_box_33->enableTrasparency(true);
-	m_box_33->hide();
-  
-  m_box_32 = addObject(new CImagePlane("images/box_32.tga"));
-	m_box_32->enableTrasparency(true);
-	m_box_32->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_32->pxSetPosition(0,0);
-	m_box_32->enableTrasparency(true);
-	m_box_32->hide();
-  
-  m_box_31 = addObject(new CImagePlane("images/box_31.tga"));
-	m_box_31->enableTrasparency(true);
-	m_box_31->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_31->pxSetPosition(0,0);
-	m_box_31->enableTrasparency(true);
-	m_box_31->hide();
-  
-	m_box_30 = addObject(new CImagePlane("images/box_30.tga"));
-	m_box_30->enableTrasparency(true);
-	m_box_30->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_30->pxSetPosition(0,0);
-	m_box_30->enableTrasparency(true);
-	m_box_30->hide();
-  
-  m_box_29 = addObject(new CImagePlane("images/box_29.tga"));
-	m_box_29->enableTrasparency(true);
-	m_box_29->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_29->pxSetPosition(0,0);
-	m_box_29->enableTrasparency(true);
-	m_box_29->hide();
-  
-  m_box_28 = addObject(new CImagePlane("images/box_28.tga"));
-	m_box_28->enableTrasparency(true);
-	m_box_28->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_28->pxSetPosition(0,0);
-	m_box_28->enableTrasparency(true);
-	m_box_28->hide();
-  
-  m_box_27 = addObject(new CImagePlane("images/box_27.tga"));
-	m_box_27->enableTrasparency(true);
-	m_box_27->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_27->pxSetPosition(0,0);
-	m_box_27->enableTrasparency(true);
-	m_box_27->hide();
-  
-  m_box_26 = addObject(new CImagePlane("images/box_26.tga"));
-	m_box_26->enableTrasparency(true);
-	m_box_26->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_26->pxSetPosition(0,0);
-	m_box_26->enableTrasparency(true);
-	m_box_26->hide();
-  
-  m_box_25 = addObject(new CImagePlane("images/box_25.tga"));
-	m_box_25->enableTrasparency(true);
-	m_box_25->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_25->pxSetPosition(0,0);
-	m_box_25->enableTrasparency(true);
-	m_box_25->hide();
-  
-  m_box_24 = addObject(new CImagePlane("images/box_24.tga"));
-	m_box_24->enableTrasparency(true);
-	m_box_24->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_24->pxSetPosition(0,0);
-	m_box_24->enableTrasparency(true);
-	m_box_24->hide();
-  
-  m_box_23 = addObject(new CImagePlane("images/box_23.tga"));
-	m_box_23->enableTrasparency(true);
-	m_box_23->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_23->pxSetPosition(0,0);
-	m_box_23->enableTrasparency(true);
-	m_box_23->hide();
-  
-  m_box_22 = addObject(new CImagePlane("images/box_22.tga"));
-	m_box_22->enableTrasparency(true);
-	m_box_22->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_22->pxSetPosition(0,0);
-	m_box_22->enableTrasparency(true);
-	m_box_22->hide();
-  
-  m_box_21 = addObject(new CImagePlane("images/box_21.tga"));
-	m_box_21->enableTrasparency(true);
-	m_box_21->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_21->pxSetPosition(0,0);
-	m_box_21->enableTrasparency(true);
-	m_box_21->hide();
-  
-  m_box_20 = addObject(new CImagePlane("images/box_20.tga"));
-	m_box_20->enableTrasparency(true);
-	m_box_20->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_20->pxSetPosition(0,0);
-	m_box_20->enableTrasparency(true);
-	m_box_20->hide();
-  
-  m_box_19 = addObject(new CImagePlane("images/box_19.tga"));
-	m_box_19->enableTrasparency(true);
-	m_box_19->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_19->pxSetPosition(0,0);
-	m_box_19->enableTrasparency(true);
-	m_box_19->hide();
-  
-  m_box_18 = addObject(new CImagePlane("images/box_18.tga"));
-	m_box_18->enableTrasparency(true);
-	m_box_18->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_18->pxSetPosition(0,0);
-	m_box_18->enableTrasparency(true);
-	m_box_18->hide();
-  
-  m_box_17 = addObject(new CImagePlane("images/box_17.tga"));
-	m_box_17->enableTrasparency(true);
-	m_box_17->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_17->pxSetPosition(0,0);
-	m_box_17->enableTrasparency(true);
-	m_box_17->hide();
-  
-  m_box_16 = addObject(new CImagePlane("images/box_16.tga"));
-	m_box_16->enableTrasparency(true);
-	m_box_16->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_16->pxSetPosition(0,0);
-	m_box_16->enableTrasparency(true);
-	m_box_16->hide();
-  
-  m_box_15 = addObject(new CImagePlane("images/box_15.tga"));
-	m_box_15->enableTrasparency(true);
-	m_box_15->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_15->pxSetPosition(0,0);
-	m_box_15->enableTrasparency(true);
-	m_box_15->hide();
-  
-  m_box_14 = addObject(new CImagePlane("images/box_14.tga"));
-	m_box_14->enableTrasparency(true);
-	m_box_14->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_14->pxSetPosition(0,0);
-	m_box_14->enableTrasparency(true);
-	m_box_14->hide();
-  
-  m_box_13 = addObject(new CImagePlane("images/box_13.tga"));
-	m_box_13->enableTrasparency(true);
-	m_box_13->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_13->pxSetPosition(0,0);
-	m_box_13->enableTrasparency(true);
-	m_box_13->hide();
-  
-  m_box_12 = addObject(new CImagePlane("images/box_12.tga"));
-	m_box_12->enableTrasparency(true);
-	m_box_12->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_12->pxSetPosition(0,0);
-	m_box_12->enableTrasparency(true);
-	m_box_12->hide();
-  
-  m_box_11 = addObject(new CImagePlane("images/box_11.tga"));
-	m_box_11->enableTrasparency(true);
-	m_box_11->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_11->pxSetPosition(0,0);
-	m_box_11->enableTrasparency(true);
-	m_box_11->hide();
-  
-  m_box_10 = addObject(new CImagePlane("images/box_10.tga"));
-	m_box_10->enableTrasparency(true);
-	m_box_10->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_10->pxSetPosition(0,0);
-	m_box_10->enableTrasparency(true);
-	m_box_10->hide();
-  
-  m_box_9 = addObject(new CImagePlane("images/box_9.tga"));
-	m_box_9->enableTrasparency(true);
-	m_box_9->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_9->pxSetPosition(0,0);
-	m_box_9->enableTrasparency(true);
-	m_box_9->hide();
-  
-  m_box_8 = addObject(new CImagePlane("images/box_8.tga"));
-	m_box_8->enableTrasparency(true);
-	m_box_8->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_8->pxSetPosition(0,0);
-	m_box_8->enableTrasparency(true);
-	m_box_8->hide();
-  
-  m_box_7 = addObject(new CImagePlane("images/box_7.tga"));
-	m_box_7->enableTrasparency(true);
-	m_box_7->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_7->pxSetPosition(0,0);
-	m_box_7->enableTrasparency(true);
-	m_box_7->hide();
-  
-  m_box_6 = addObject(new CImagePlane("images/box_6.tga"));
-	m_box_6->enableTrasparency(true);
-	m_box_6->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_6->pxSetPosition(0,0);
-	m_box_6->enableTrasparency(true);
-	m_box_6->hide();
-  
-  m_box_5 = addObject(new CImagePlane("images/box_5.tga"));
-	m_box_5->enableTrasparency(true);
-	m_box_5->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
-	m_box_5->pxSetPosition(0,0);
-	m_box_5->enableTrasparency(true);
-	m_box_5->hide();
+  m_box_gap = addObject(new CImagePlane("images/box_5.tga"));
+	m_box_gap->enableTrasparency(true);
+	m_box_gap->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE),m_paramsFile->getInteger(CFG_BOX_SIZE));
+	m_box_gap->pxSetPosition(0,0);
+	m_box_gap->enableTrasparency(true);
+	m_box_gap->hide();
 
 	// set the pixel increment for the test calibration procedure during the exp (NO CHANGES)
 	Increment = 1;
@@ -364,7 +154,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 	// store the stabilized trace ( --- all in px)
 	if (SHOW_TARGET==0)
 	{
-		//HEY BY THE WAY THERE DOESN'T APPEAR TO BE A CSTABILIZER IN THE EYERIS
+	
 	CStabilizer::Instance()->
 				stabilize(Samples, X, Y);  
     X = X+xshift;
@@ -539,11 +329,11 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			if (debug==1)
 			{
 				X = 0;
-			    Y = 0;
+			    	Y = 0;
 			}
 			//records when fixation breaks
 			TimeFixationOFF = m_timerExp.getTime();
-			// if neutral cue is on or if a neutral catch trial is on
+			// if neutral cue is on or if a neutral
 			if (TrialType == 2)
 			{
 				m_neutralcue->pxSetPosition(X,Y);
@@ -574,13 +364,13 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			}
 			if ((TrialType == 2) )
 			{
-				m_neutralcue->pxSetPosition(X,Y);
+				m_neutralcue->pxSetPosition(0,0);
 				m_neutralcue->show();
 				
 			}			
 			else
 			{
-				m_cue->pxSetPosition(X,Y);
+				m_cue->pxSetPosition(0,0);
 				m_cue->show();	
 			}
 		}
@@ -622,7 +412,7 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			//question
 			
 			
-			m_fixation->pxSetPosition(X,Y);
+			m_fixation->pxSetPosition(0,0);
 			m_fixation->show();
 			
 			
@@ -636,18 +426,16 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			{
 			TimeISI1OFF = m_timerExp.getTime();
 			
-			///NEED TO READ FROM TARGET LIST
-			//make an array of the boxes (actual images) and then set the targets to the image at the index (gapsize - 6)
-			//m_Ltarget = ;
-			//m_Rtarget = ;
+			//m_Ltarget = m_box_gap;
+			//m_Rtarget = m_box_gap;
 			
 		   	SHOW_TARGET = 1;
-			//m_target->pxSetPosition(X+XTargetOffset, Y);//LEFT AND RIGHT
+			//m_target->pxSetPosition(0+XTargetOffset, 0);//LEFT AND RIGHT
 			
 			
-			m_Ltarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)//*
+			m_Ltarget->pxSetPosition(0 + XTargetOffset,0 + YTargetOffset)//*
 			
-			m_Rtarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)
+			m_Rtarget->pxSetPosition(0 + XTargetOffset,0 + YTargetOffset)
 			
 			if(LGapDirection == 1){
 				m_Ltarget -> degSetAngle(180);
@@ -655,10 +443,6 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			if(RGapDirection == 1){
 				m_Rtarget -> degSetAngle(180);
 			}//*
-			
-			
-			
-			
 			
 			m_Ltarget->show();//*
 			m_RTarget->show();
@@ -676,26 +460,24 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			if ((gate==1) && (m_timertarget.isExpired()))
 			{ // go to the next state
 			
-			m_state = STATE_RESPONSE_CUE;
-			m_Ltarget->hide();//2 target should be hided
-			m_Rtarget->hide();//2 target should be hided
-			
-			
-   			m_fixation->pxSetPosition(X,Y);
-			m_fixation->show();
+				m_state = STATE_RESPONSE_CUE;
+				m_Ltarget->hide();//2 target should be hided
+				m_Rtarget->hide();//2 target should be hided
 
-			
-			
-			CEnvironment::Instance()->outputMessage("State Response Cue");
-			// set the time before the target appears after the cue (based on the ISI --> take this from the parameter file)
-			m_timerisi.start(m_paramsFile->getInteger(CFG_CUE_TARGET_TIME));
-			TimeISI2ON = m_timerExp.getTime();
-		
-			CEnvironment::Instance()->outputMessage("ISI time: %.2i", CueTargetTime);
-			m_fixation->pxSetPosition(X,Y);
-			m_fixation->show();
-		
-		gate = 0;
+
+				m_fixation->pxSetPosition(0,0);
+				m_fixation->show();
+
+				CEnvironment::Instance()->outputMessage("State Response Cue");
+				// set the time before the target appears after the cue (based on the ISI --> take this from the parameter file)
+				m_timerisi.start(m_paramsFile->getInteger(CFG_CUE_TARGET_TIME));
+				TimeISI2ON = m_timerExp.getTime();
+
+				CEnvironment::Instance()->outputMessage("ISI time: %.2i", CueTargetTime);
+				m_fixation->pxSetPosition(0,0);
+				m_fixation->show();
+
+				gate = 0;
 			
 			}
 			
@@ -703,11 +485,11 @@ void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
 			//If timer isn't expired, continue to show the target
 			else if ((gate==1) && (!m_timertarget.isExpired()))
 			{
-				m_fixation->pxSetPosition(X,Y);
+				m_fixation->pxSetPosition(0,0);
 				m_fixation->show();			
 
-				m_Ltarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)//*
-				m_Rtarget->pxSetPosition(X + XTargetOffset,Y + YTargetOffset)
+				m_Ltarget->pxSetPosition(0 + XTargetOffset,0 + YTargetOffset)//*
+				m_Rtarget->pxSetPosition(0 + XTargetOffset,0 + YTargetOffset)
 
 				m_Ltarget->show();//*
 				m_RTarget->show();
@@ -742,33 +524,33 @@ case RESPONSE_CUE:
       else if (TrialType == 0 && CueDirection == -1) {
           //show the response cue to the right.  We'll want to change the color though, so probably upload a new cue image around line 30
           ResponseCueDirection == 1
-          m_response_cue->pxSetPosition(X,Y);
+          m_response_cue->pxSetPosition(0,0);
           m_response_cue->show();
       }
       //if invalid trial and cue was to the right
       else if (TrialType == 1 && CueDirection == 1) {
         //show response cue to the left
           ResponseCueDirection == -1
-          m_response_cue->pxSetPosition(X,Y);
+          m_response_cue->pxSetPosition(0,0);
           m_response_cue->show();
       }
       //if valid trial and Cue was to the left
       if (TrialType == 1 && CueDirection == -1) {
           //show the response cue to the left.  We'll want to change the color though, so probably upload a new cue image around line 30
           ResponseCueDirection == -1
-          m_response_cue->pxSetPosition(X,Y);
+          m_response_cue->pxSetPosition(0,0);
           m_response_cue->show();
       }
       //if valid trial and cue was to the right
       else if (TrialType == 1 && CueDirection == 1) {
           ResponseCueDirection == 1
-          m_response_cue->pxSetPosition(X,Y);
+          m_response_cue->pxSetPosition(0,0);
           m_response_cue->show();
       }
       else if (TrialType == 2) {
           //use a random number generator
           ResponseCueDirection == 1 or -1;
-          m_response_cue --> pxSetPosition(X,Y);
+          m_response_cue --> pxSetPosition(0,0);
           m_response_cue->show();
       }
       // time for cue presentation
@@ -793,33 +575,33 @@ case RESPONSE_CUE:
       else if (TrialType == 0 && CueDirection == -1) {
           //show the response cue to the right.  We'll want to change the color though, so probably upload a new cue image around line 30
           ResponseCueDirection == 1
-          m_response_cue->pxSetPosition(X,Y);
+          m_response_cue->pxSetPosition(0,0);
           m_response_cue->show();
       }
       //if invalid trial and cue was to the right
       else if (TrialType == 1 && CueDirection == 1) {
         //show response cue to the left
           ResponseCueDirection == -1
-          m_response_cue->pxSetPosition(X,Y);
+          m_response_cue->pxSetPosition(0,0);
           m_response_cue->show();
       }
       //if valid trial and Cue was to the left
       if (TrialType == 1 && CueDirection == -1) {
           //show the response cue to the left.  We'll want to change the color though, so probably upload a new cue image around line 30
           ResponseCueDirection == -1
-          m_response_cue->pxSetPosition(X,Y);
+          m_response_cue->pxSetPosition(0,0);
           m_response_cue->show();
       }
       //if valid trial and cue was to the right
       else if (TrialType == 1 && CueDirection == 1) {
           ResponseCueDirection == 1
-          m_response_cue->pxSetPosition(X,Y);
+          m_response_cue->pxSetPosition(0,0);
           m_response_cue->show();
       }
       else if (TrialType == 2) {
           //use a random number generator
           ResponseCueDirection == 1 or -1;
-          m_response_cue --> pxSetPosition(X,Y);
+          m_response_cue --> pxSetPosition(0,0);
           m_response_cue->show();
       }
   }
@@ -836,7 +618,7 @@ case RESPONSE_CUE:
 			m_state = STATE_RESPONSE;
 			WAIT_RESPONSE = 0;
 			m_response_cue->hide();
-			m_fixation->pxSetPosition(X,Y);
+			m_fixation->pxSetPosition(0,0);
 			m_fixation->show();
 			TimeResponseCueOFF = m_timerExp.getTime();
 		
