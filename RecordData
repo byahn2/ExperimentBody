@@ -1,0 +1,88 @@
+//in save data/
+
+/Environment::Instance()->outputMessage("Cue target timing: %.2i", CueTargetTime);
+	if (TrialType == 1)
+	{
+		CurrentRTValid = CurrentRTValid + (ResponseTime - TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("valid trial number - %i ", NumberValidTrials);
+		CEnvironment::Instance()->outputMessage("RT valid (running average) - %f ", CurrentRTValid / NumberValidTrials);
+		if (isCorrect) {
+			ValidCorrect = ValidCorrect + 1;
+		}
+		CurrentValid = ValidCorrect / NumberValidTrials;
+		CEnvironment::Instance()->outputMessage("valid trial number - %i ", CurrentValid);
+
+
+	}
+
+	if (TrialType == 0)
+	{
+		CurrentRTInvalid = CurrentRTInvalid + (ResponseTime - TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("invalid trial number - %i ", NumberInvalidTrials);
+		CEnvironment::Instance()->outputMessage("RT invalid (running average) - %f ", CurrentRTInvalid / NumberInvalidTrials);
+    if (isCorrect) {
+			InvalidCorrect = InvalidCorrect + 1;
+		}
+		CurrentInvalid = InvalidCorrect / NumberInvalidTrials;
+		CEnvironment::Instance()->outputMessage("valid trial number - %i ", CurrentInvalid);
+	}
+
+	if (TrialType == 2)
+	{
+		CurrentRTNeutral = CurrentRTNeutral + (ResponseTime - TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("neutral trial number - %i ", NumberNeutralTrials);
+		CEnvironment::Instance()->outputMessage("RT neutral (running average) - %f ", CurrentRTNeutral / NumberNeutralTrials);
+    if (isCorrect) {
+			NeutralCorrect = NeutralCorrect + 1;
+		}
+		CurrentNeutral = NeutralCorrect / NumberNeutralTrials;
+		CEnvironment::Instance()->outputMessage("valid trial number - %i ", CurrentNeutral);
+	}
+  
+  
+  
+    //Near top of ExperimentBodycpp
+    
+  m_box_gap = addObject(new CImagePlane("images/box_15.tga"));
+	m_box_gap->enableTrasparency(true);
+	m_box_gap->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE), m_paramsFile->getInteger(CFG_BOX_SIZE));
+	m_box_gap->pxSetPosition(0, 0);
+	m_box_gap->enableTrasparency(true);
+	m_box_gap->hide();
+
+	// set the pixel increment for the test calibration procedure during the exp (NO CHANGES)
+	Increment = 1;
+	ResponseFinalize = 0;
+	xshift = 0;
+	yshift = 0;
+	xPos = 0;
+	yPos = 0;
+	TrialNumber = 1;
+	m_numTestCalibration = 0;
+	Curr_stim = 0;
+	CurrentRTValid = 0;
+	NumberValidTrials = 0;
+  ValidCorrect = 0;
+  CurrentValid = 0;
+	CurrentRTInvalid = 0;
+	NumberInvalidTrials = 0;
+  InvalidCorrect = 0;
+  CurrentInvalid = 0;
+	CurrentRTNeutral = 0;
+	NumberNeutralTrials = 0
+  NeutralCorrect = 0;
+  CurrentNeutral = 0;
+  
+	// set TestCalibration = 1 so that the experiment will start with a recalibration trial
+	TestCalibration = 1;
+	m_numCompleted = 0;
+
+
+
+//put in H file
+int NeutralCorrect;
+int CurrentNeutral;
+int ValidCorrect;
+int CurrentValid;
+int InvalidCorrect;
+int CurrentInvalid;
