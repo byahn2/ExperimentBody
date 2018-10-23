@@ -1,0 +1,1189 @@
+#include "stdafx.h"
+#include "ExperimentBody.h"
+#include "ContrastSensitivity_Eccentricity.h"
+#include <math.h>
+
+const float PI = 3.1415926353f;
+
+///////////////////////////////////////////////////////////////////////////////////
+ExperimentBody::ExperimentBody(int pxWidth, int pxHeight, int RefreshRate, CCfgFile* Params) :
+	CExperiment(pxWidth, pxHeight, RefreshRate),
+
+	m_paramsFile(Params)
+{
+	setExperimentName("FovealAttention");
+
+	CMath::srand(time(NULL));
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+void ExperimentBody::initialize()
+{
+	CStabilizer::Instance()->enableSlowStabilization(true);
+
+
+	m_fixation = addObject(new CImagePlane("images/fixation.tga"));
+	m_fixation->enableTrasparency(true);
+	m_fixation->pxSetSize(10, 10);
+	m_fixation->pxSetPosition(0, 0);
+	m_fixation->hide();
+
+	m_box_gap = addObject(new CImagePlane("images/cue.tga"));//need to redraw
+	m_box_gap->enableTrasparency(true);
+	m_box_gap->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE), m_paramsFile->getInteger(CFG_BOX_SIZE));
+	m_box_gap->pxSetPosition(0, 0);
+	m_box_gap->enableTrasparency(true);
+	m_box_gap->hide();
+
+	
+	m_Ltarget = addObject(new CImagePlane("images/cue.tga"));
+	m_Ltarget->enableTrasparency(true);
+	m_Ltarget->pxSetSize(30, 30);
+	m_Ltarget->pxSetPosition(0, 0);
+	m_Ltarget->hide();
+
+
+	m_Rtarget = addObject(new CImagePlane("images/cue.tga"));
+	m_Rtarget->enableTrasparency(true);
+	m_Rtarget->pxSetSize(30, 30);
+	m_Rtarget->pxSetPosition(0, 0);
+	m_Rtarget->hide();
+	
+
+	
+
+
+	//change in parameter file
+	m_cue = addObject(new CImagePlane("images/cue.tga"));
+	m_cue->enableTrasparency(true);
+	m_cue->pxSetSize(m_paramsFile->getInteger(CFG_CUE_SIZE), m_paramsFile->getInteger(CFG_CUE_SIZE));
+	m_cue->pxSetPosition(0, 0);
+	m_cue->hide();
+
+	m_neutralcue = addObject(new CImagePlane("images/neutralcue.tga"));
+	m_neutralcue->enableTrasparency(true);
+	m_neutralcue->pxSetSize(m_paramsFile->getInteger(CFG_CUE_SIZE), m_paramsFile->getInteger(CFG_CUE_SIZE));
+	m_neutralcue->pxSetPosition(0, 0);
+	m_neutralcue->hide();
+
+	m_response_cue = addObject(new CImagePlane("images/cue.tga"));
+	m_response_cue->enableTrasparency(true);
+	m_response_cue->pxSetSize(m_paramsFile->getInteger(CFG_CUE_SIZE), m_paramsFile->getInteger(CFG_CUE_SIZE));
+	m_response_cue->pxSetPosition(0, 0);
+	m_response_cue->hide();
+
+	m_box = addObject(new CImagePlane("images/box.tga"));
+	m_box->enableTrasparency(true);
+	m_box->pxSetSize(m_paramsFile->getInteger(CFG_BOX_SIZE), m_paramsFile->getInteger(CFG_BOX_SIZE));
+	m_box->pxSetPosition(0, 0);
+	m_box->enableTrasparency(true);
+	m_box->hide();
+
+	
+
+	// set the pixel increment for the test calibration procedure during the exp (NO CHANGES)
+	Increment = 1;
+	ResponseFinalize = 0;
+	xshift = 0;
+	yshift = 0;
+	xPos = 0;
+	yPos = 0;
+	TrialNumber = 1;
+	m_numTestCalibration = 0;
+	Curr_stim = 0;
+	CurrentRTValid = 0;
+	NumberValidTrials = 0;
+	ValidCorrect = 0;
+	CurrentValid = 0;
+	CurrentRTInvalid = 0;
+	NumberInvalidTrials = 0;
+	InvalidCorrect = 0;
+	CurrentInvalid = 0;
+	CurrentRTNeutral = 0;
+	NumberNeutralTrials = 0
+	NeutralCorrect = 0;
+	CurrentNeutral = 0;
+	// set TestCalibration = 1 so that the experiment will start with a recalibration trial
+	TestCalibration = 1;
+	m_numCompleted = 0;
+
+	// crosses for the recalibration trials	 (NO CHANGES)
+	m_redcross = addObject(new CImagePlane("images/redcross.tga"));
+	m_redcross->enableTrasparency(true);
+	m_redcross->hide();
+	m_whitecross = addObject(new CImagePlane("images/whitecross.tga"));
+	m_whitecross->enableTrasparency(true);
+	m_whitecross->hide();
+
+	//Load session data
+	loadSession();
+	loadProgress();
+
+	disable(CExperiment::EIS_PHOTOCELL);
+	disable(CExperiment::EIS_NOTRACK_ICON);
+	disable(CExperiment::EIS_STAT1);
+
+	// set the distance of the target from the gaze (NO CHANGES)
+	XTargetOffset = m_paramsFile->getInteger(CFG_TARGET_OFFSET);
+	YTargetOffset = XTargetOffset;
+
+	debug = m_paramsFile->getInteger(CFG_DEBUG);
+
+	hideAllObjects();
+	m_state = STATE_LOADING;
+	m_timer.start(1000);
+
+	WAIT_RESPONSE = 1;
+
+	/* Seed the random-number generator with current time so that
+	* the numbers will be different every time we run.*/
+	//Save the seed time and record it
+	/*seedtime = (unsigned)time(NULL);*/
+	srand((unsigned)time(NULL));
+	
+
+}
+///////////////////////////////////////////////////////////////////////////////////
+// write the progress file
+void ExperimentBody::finalize() ///(NO CHANGE)
+{
+	// write progress
+	if (m_numCompleted > 0)//check to see that some experiments have been conducted
+	{
+		char LocalDate[1024];
+		time_t t = time(NULL);
+		strftime(LocalDate, 1024, "%Y-%m-%d-%H-%M-%S", localtime(&t));
+
+		ostringstream fstr1;
+		fstr1 << "Data\\" << m_paramsFile->getString(CFG_SUBJECT_NAME) << "\\" << m_paramsFile->getString(CFG_SUBJECT_NAME) << "Progress.txt";
+
+		ofstream out1(fstr1.str().c_str(), ios::app);
+
+		if (!out1.is_open())
+		{
+			CEnvironment::Instance()->outputMessage(CEnvironment::ENV_MSG_ERROR, "Session data file (%sProgress.txt) could not be opened.  Please check that the file exists.", m_paramsFile->getString(CFG_SUBJECT_NAME));
+			CEnvironment::Instance()->outputMessage(CEnvironment::ENV_MSG_ERROR, "Index of last saved file: %i.", m_sessionEnd);
+			declareFinished();
+
+		}
+		// If there were previous sessions/trials keep track of the last trial played in the list and start from there in the next session
+		out1 << "Recorded: " << LocalDate << endl;
+		out1 << m_sessionBegin << endl;
+		out1 << m_sessionEnd << endl;
+
+	}
+
+}
+///////////////////////////////////////////////////////////////////////////////////
+void ExperimentBody::eventRender(unsigned int FrameCount, CEOSData* Samples)
+{
+
+	
+	// store the stabilized trace ( --- all in px)
+	if (SHOW_TARGET == 0)
+	{
+
+		CStabilizer::Instance()->
+			stabilize(Samples, X, Y);
+		X = X + xshift;
+		Y = Y + yshift;
+	}
+	storeTrialStream(0, X);
+	storeTrialStream(1, Y);
+	// add the offset
+
+	if (debug == 1)
+	{
+		X = 0;
+		Y = 0;
+	}
+
+	//m_box->pxSetPosition(X + XTargetOffset, Y);
+	//m_box->show();
+		float x;
+		float y;
+		float dist;
+	//m_box->show();
+	m_whitecross->show();
+
+	switch (m_state) {
+	case STATE_LOADING:
+
+
+		COGLEngine::Instance()->clearScreen();
+		glColor3d(255, 255, 255);
+		//printCentered(CFontEngine::FONTS_ARIAL_18, 0, 0, "Loading...");
+
+		// Set the background color for the experiment
+		//COGLEngine::Instance()->setBackgroundColor(100, 100, 100);
+		COGLEngine::Instance()->setBackgroundColor(0, 0, 0);
+
+		// Copy the parameter file into the subject directory
+		if (m_timer.isExpired())
+		{
+			char LocalDate[1024];
+			time_t t = time(NULL);
+			strftime(LocalDate, 1024, "%Y-%m-%d-%H-%M-%S", localtime(&t));
+
+			//WE WILL NEED TO CHANGE THE DESTINATION FILENAME (IN PARAMETERS)
+			ostringstream DestinationFileName;
+			DestinationFileName << m_paramsFile->getDirectory(CFG_DATA_DESTINATION) <<
+				m_paramsFile->getString(CFG_SUBJECT_NAME) << "/" << m_paramsFile->getString(CFG_SUBJECT_NAME) <<
+				"-" << LocalDate << "-params.cfg";;
+			gotoFixation();
+		}
+
+		break;
+
+		//NO NEED TO CHANGE ANYTHING IN THIS SECTION
+	case STATE_TESTCALIBRATION:
+
+		m_box->hide();
+		if (!m_timerCheck.isExpired())
+		{
+			//NO CCONVERTER IN EYERIS
+			CConverter::Instance()->a2p(Samples->x1, Samples->y1, x, y);
+		}
+		else
+		{
+			//CEnvironment::Instance()->outputMessage("State Test Calibration, ResponseFinalize: %.0i", ResponseFinalize);
+			if (!(ResponseFinalize == 1))
+			{
+				CConverter::Instance()->a2p(Samples->x1, Samples->y1, x, y);
+				moveToFront(m_redcross);
+				m_redcross->pxSetPosition(x + xshift + xPos, y + yshift + yPos);
+				//m_redcross->pxSetPosition(x,y);
+				m_redcross->show();
+				m_whitecross->pxSetPosition(0, 0);
+				m_whitecross->show();
+			}
+			else
+			{
+				//CEnvironment::Instance()->outputMessage("State Test Calibration");
+				TestCalibration = 0;
+
+				xshift = xPos + xshift;
+				yshift = yPos + yshift;
+				//CEnvironment::Instance()->outputMessage("State Test Calibration, xshift: %.2f", xshift);
+				//CEnvironment::Instance()->outputMessage("State Test Calibration, yshift: %.2f", yshift);
+				//CEnvironment::Instance()->outputMessage("----------------------------------------------------------------");
+
+
+				m_redcross->hide();
+				m_whitecross->hide();
+
+				endTrial();
+				gotoFixation();
+
+			}
+
+		}
+		break;
+
+		//  STATE_FIXATION: the box appears at the center of the screen, subject is instructed to move the gaze at the center of the box,
+		//                  as soon as the gaze is close to the center a fixation point appears at the center of gaze
+		//                  the fixation point is stabilized and fixation should be maintained for 1 s or until the gaze is stabilized
+		//                  than go to the next state.
+	case STATE_FIXATION:
+
+		// check if the subject is looking at the center
+		//use stabilized positions acquired at the beginning of the render cycle 
+		Dist = sqrt((pow(0 - (X), 2) + pow(0 - (Y), 2)));
+
+		//DON'T NEED TO CHANGE		
+		if (((Dist < 100) &&
+			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_BADDATA) &&
+			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_EMEVENT)) && (gate == 1)
+			||
+			((debug == 1) && (gate == 1)))
+		{
+			// enter here only the first time stabilization is activated
+
+			// this initializes stabilizer settings the first time
+			//	stabilization routine is entered.
+			// reset the filter with positions in arcmin
+			CStabilizer::Instance()->
+				resetFilter(Samples->x1, Samples->y1);
+			gate = 0;
+			// time for fixation ON
+			TimeFixationON = m_timerExp.getTime();
+			//CEnvironment::Instance()->outputMessage("State Fixation");
+			// fixation should stay on for one sec or as far as the gaze is stabilized
+			m_timerfixation.start(m_paramsFile->getInteger(CFG_FIXATION_TIME));
+
+		}
+
+		if (gate == 0)
+		{
+
+			// update the stabilized coordinates based on the offset introduced by the subject
+			if (debug == 1)
+			{
+				X = 0;
+				Y = 0;
+			}
+
+			// show the stabilized fixation marker with slow stabilization
+			m_fixation->pxSetPosition(X, Y);
+			m_fixation->show();
+
+			if (m_timerfixation.isExpired())
+			{
+				// if the subject is looking in the central area show the stabilized stimulus
+				m_state = STATE_CUE;
+			}
+
+			//CEnvironment::Instance()->outputMessage("State Cue");
+		}
+
+
+
+		break;
+
+		// STATE_CUE: wait until subject stabilized fixation
+		//            present the cue
+		//            stabilize the cue for the ISI time
+		//            go to the next state and present the target
+	case STATE_CUE:
+
+		// check if the subject is looking at the fixation and that there is a drift (no saccades or notrack)
+		if (((gate == 0) &&
+			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_BADDATA) &&
+			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_EMEVENT) && (m_timerfixation.isExpired()))
+			||
+			((debug == 1) && (gate == 0)))
+		{
+
+			if (debug == 1)
+			{
+				X = 0;
+				Y = 0;
+			}
+			//records when fixation breaks
+			TimeFixationOFF = m_timerExp.getTime();
+			// if neutral cue is on or if a neutral
+			if (TrialType == 2)
+			{
+				m_neutralcue->pxSetPosition(X, Y);
+				m_neutralcue->show();
+			}
+			else
+			{
+				m_cue->pxSetPosition(X, Y);
+				m_cue->show();
+			}
+			// time for cue presentation
+			TimeCueON = m_timerExp.getTime();
+
+			gate = 1;
+			// set the time for the cue 
+			m_timercue.start(m_paramsFile->getInteger(CFG_CUE_TIME));
+
+		}
+
+		//If cue hasn't expired and gate == 1 then continue to stabalize cue
+		if ((!m_timercue.isExpired()) && (gate == 1))
+		{
+			// continue to stabilize the cue
+			if (debug == 1)
+			{
+				X = 0;
+				Y = 0;
+			}
+			if ((TrialType == 2))
+			{
+				m_neutralcue->pxSetPosition(0, 0);
+				m_neutralcue->show();
+
+			}
+			else
+			{
+				m_cue->pxSetPosition(0, 0);
+				m_cue->show();
+			}
+		}
+		// when the time for the cue is over go to the next state 
+		else if ((m_timercue.isExpired()) && (gate == 1))
+		{
+
+			m_state = STATE_TARGET;
+			m_fixation->pxSetPosition(X, Y);
+			m_fixation->show();
+
+			// set the time before the target appears after the cue (based on the ISI --> take this from the parameter file)
+			//m_timerisi.start(m_paramsFile->getInteger(CFG_CUE_TARGET_TIME));
+			CEnvironment::Instance()->outputMessage("Cue target timing: %.2i", CueTargetTime);
+
+			m_timerisi.start(m_paramsFile->getInteger(CFG_FIXATION_TIME));
+
+			TimeISI1ON = m_timerExp.getTime();///////////////////////////////////////////////
+			m_cue->hide();
+			m_neutralcue->hide();
+			m_fixation->pxSetPosition(X, Y);
+			m_fixation->show();
+			gate = 0;
+			//get the time when the cue disappears
+			TimeCueOFF = m_timerExp.getTime();
+		}
+
+		break;
+
+		// STATE_TARGET: present the target
+		// go to the next state and wait for subject response
+		//THINGS TO CHANGE: we need two targets.  we need a variable for target orientation.  we need an occluder of different sizes
+		//to put in front of the image.  we need two options for the location of each bar.  we need to keep track of where it is.
+	case STATE_TARGET:
+
+
+		//CEnvironment::Instance()->outputMessage("State Target");
+		// continue to stabilize the fixation marker;
+
+		//question
+
+
+		m_fixation->pxSetPosition(0, 0);
+		m_fixation->show();
+
+
+		if (debug == 1)
+		{
+			X = 0;
+			Y = 0;
+		}
+
+		if (m_timerisi.isExpired() && (gate == 0))
+		{
+			TimeISI1OFF = m_timerExp.getTime();
+
+			//m_Ltarget = m_box_gap;
+			//m_Rtarget = m_box_gap;
+
+			SHOW_TARGET = 1;
+			//m_target->pxSetPosition(0+XTargetOffset, 0);//LEFT AND RIGHT
+
+
+			m_Ltarget->pxSetPosition(0 + XTargetOffset, 0 + YTargetOffset);//*
+
+			m_Rtarget->pxSetPosition(0 - XTargetOffset, 0 - YTargetOffset);
+
+			if (LGapDirection == 1) {
+					m_Ltarget->degSetAngle(180);
+				}
+			if (RGapDirection == 1) {
+				m_Rtarget->degSetAngle(180);
+			}//*
+
+			
+			m_Ltarget->show();//*
+			m_Rtarget->show();
+			
+
+			TimeTargetON = m_timerExp.getTime();
+			// set target duration
+			m_timertarget.start(m_paramsFile->getInteger(CFG_TARGET_TIME));
+
+			gate = 1;
+		}
+		
+
+
+		if ((gate == 1) && (m_timertarget.isExpired()))
+		{ // go to the next state
+
+			m_state = STATE_RESPONSE_CUE;
+			m_Ltarget->hide();//2 target should be hided
+			m_Rtarget->hide();//2 target should be hided
+
+
+			m_fixation->pxSetPosition(0, 0);
+			m_fixation->show();
+
+			CEnvironment::Instance()->outputMessage("State Response Cue");
+			// set the time before the target appears after the cue (based on the ISI --> take this from the parameter file)
+			m_timerisi.start(m_paramsFile->getInteger(CFG_CUE_TARGET_TIME));
+			TimeISI2ON = m_timerExp.getTime();
+
+			CEnvironment::Instance()->outputMessage("ISI time: %.2i", CueTargetTime);
+			m_fixation->pxSetPosition(0, 0);
+			m_fixation->show();
+
+			gate = 0;
+
+		}
+
+
+		//If timer isn't expired, continue to show the target
+		else if ((gate == 1) && (!m_timertarget.isExpired()))
+		{
+			m_fixation->pxSetPosition(0, 0);
+			m_fixation->show();
+
+			m_Ltarget->pxSetPosition(0 + XTargetOffset, 0 + YTargetOffset);
+			m_Rtarget->pxSetPosition(0 - XTargetOffset, 0 - YTargetOffset);
+
+			m_Rtarget->show();
+			m_Ltarget->show();
+		}
+
+
+		break;
+
+
+	case STATE_RESPONSE_CUE:
+
+		//check if the subject is looking at the fixation and that there is a drift (no saccades or notrack)
+		if (((gate == 0) && (m_timerisi.isExpired() && (gate == 0)) &&
+			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_BADDATA) &&
+			!CTriggers::any(Samples->triggers, Samples->samplesNumber, EOS_TRIG_1_EMEVENT) && (m_timerfixation.isExpired()))
+			||
+			((debug == 1) && (gate == 0)))
+		{
+			
+			TimeISI2OFF = m_timerExp.getTime();
+			
+			if (debug == 1)
+			{
+				X = 0;
+				Y = 0;
+			}
+			// show the cue at fixation and hide the fixation point (don't hide fixation)
+			//records when fixation breaks
+			
+
+
+			//if invalid trial and cue was to the left
+			else if (TrialType == 0 && CueDirection == -1) {
+				//show the response cue to the right.  We'll want to change the color though, so probably upload a new cue image around line 30
+				ResponseCueDirection == 1;
+					m_response_cue->pxSetPosition(0, 0);
+				m_response_cue->show();
+			}
+			//if invalid trial and cue was to the right
+			else if (TrialType == 1 && CueDirection == 1) {
+				//show response cue to the left
+				ResponseCueDirection == -1;
+					m_response_cue->pxSetPosition(0, 0);
+				m_response_cue->show();
+			}
+			//if valid trial and Cue was to the left
+			if (TrialType == 1 && CueDirection == -1) {
+				//show the response cue to the left.  We'll want to change the color though, so probably upload a new cue image around line 30
+				ResponseCueDirection == -1;
+					m_response_cue->pxSetPosition(0, 0);
+				m_response_cue->show();
+			}
+			//if valid trial and cue was to the right
+			else if (TrialType == 1 && CueDirection == 1) {
+				ResponseCueDirection == 1;
+					m_response_cue->pxSetPosition(0, 0);
+				m_response_cue->show();
+			}
+			else if (TrialType == 2 ) {
+				
+				m_response_cue-> pxSetPosition(0, 0);
+				m_response_cue->show();
+			}
+			// time for cue presentation
+			TimeResponseCueON = m_timerExp.getTime();
+
+			gate = 1;
+			// set the time for the cue 
+			m_timercue.start(m_paramsFile->getInteger(CFG_CUE_TIME));
+
+		}
+
+		if ((!m_timercue.isExpired()) && (gate == 1))
+		{
+			// continue to stabilize the cue
+			if (debug == 1)
+			{
+				X = 0;
+				Y = 0;
+			}
+
+			//if invalid trial and cue was to the left
+			else if (TrialType == 0 && CueDirection == -1) {
+				//show the response cue to the right.  We'll want to change the color though, so probably upload a new cue image around line 30
+				ResponseCueDirection == 1;
+					m_response_cue->pxSetPosition(0, 0);
+				m_response_cue->show();
+			}
+			//if invalid trial and cue was to the right
+			else if (TrialType == 1 && CueDirection == 1) {
+				//show response cue to the left
+				ResponseCueDirection == -1;
+					m_response_cue->pxSetPosition(0, 0);
+				m_response_cue->show();
+			}
+			//if valid trial and Cue was to the left
+			if (TrialType == 1 && CueDirection == -1) {
+				//show the response cue to the left.  We'll want to change the color though, so probably upload a new cue image around line 30
+				ResponseCueDirection == -1;
+					m_response_cue->pxSetPosition(0, 0);
+				m_response_cue->show();
+			}
+			//if valid trial and cue was to the right
+			else if (TrialType == 1 && CueDirection == 1) {
+				ResponseCueDirection == 1;
+					m_response_cue->pxSetPosition(0, 0);
+				m_response_cue->show();
+			}
+			else if (TrialType == 2) {
+				m_response_cue-> pxSetPosition(0, 0);
+				m_response_cue->show();
+			}
+		}
+		// when the time for the cue is over go to the next state 
+		else if ((m_timercue.isExpired()) && (gate == 1))
+		{
+
+			m_response_cue->hide();
+			gate = 0;
+			//get the time when the cue disappears
+			TimeResponseCueOFF = m_timerExp.getTime();
+
+			m_timerhold.start(m_paramsFile->getInteger(CFG_HOLD_TIME));
+			m_state = STATE_RESPONSE;
+			WAIT_RESPONSE = 0;
+			m_response_cue->hide();
+			m_fixation->pxSetPosition(0, 0);
+			m_fixation->show();
+			TimeResponseCueOFF = m_timerExp.getTime();
+
+		}
+
+		break;
+
+		// STATE_RESPONSE: wait for subject response
+	case STATE_RESPONSE:
+
+		CorrectAnswer = 0;
+		if (TrialType == 0 && CueDirection == -1)
+		{
+			CorrectAnswer = RGapDirection;
+		}
+
+		else if (TrialType == 0 && CueDirection == 1)
+		{
+			CorrectAnswer = LGapDirection;
+		}
+
+		else if (TrialType == 1 && CueDirection == -1)
+		{
+			CorrectAnswer = LGapDirection;
+		}
+
+		else if (TrialType == 1 && CueDirection == 1)
+		{
+			CorrectAnswer = RGapDirection;
+		}
+
+		else if (TrialType == 2 && CueDirection == -1)
+		{
+			CorrectAnswer = LGapDirection;
+		}
+
+		else if (TrialType == 2 && CueDirection == 1)
+		{
+			CorrectAnswer = RGapDirection;
+		}
+
+		if (AnswerDirection == CorrectAnswer)
+			isCorrect = true;
+		else
+			isCorrect = false;
+
+
+		if (!(m_timerhold.isExpired()))
+		{
+			// continue to stabilize the fixation marker
+			if (debug == 1)
+			{
+				X = 0;
+				Y = 0;
+			}
+			m_fixation->pxSetPosition(X, Y);
+			m_fixation->show();
+		}
+
+		if ((m_timerhold.isExpired()) && (WAIT_RESPONSE == 0))
+		{
+			// response is not given
+			ResponseTime = 0;
+			// hide all the objects 
+			hideAllObjects();
+			m_Ltarget->hide();
+			m_Rtarget->hide();
+			m_fixation->hide();
+			//m_box->hide();
+
+			endTrial(); //NO DEFINATION FOR ENDTRAIL
+			saveData();
+		}
+
+		else if (WAIT_RESPONSE == 1)
+		{
+			// hide all the objects 
+			hideAllObjects();
+			m_Ltarget->hide();
+			m_Rtarget->hide();
+			m_fixation->hide();
+			//m_box->hide();
+
+			endTrial();
+			saveData();
+		}
+
+		break;
+	}
+}
+///////////////////////////////////////////////////////////////////////////////////
+void ExperimentBody::eventJoypad()
+{
+	// activate the joypad only in the state calibration	
+
+	if (m_state == STATE_TESTCALIBRATION)
+	{
+
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_UP)) // moving the cursor up
+		{
+			yPos = yPos + Increment; //position of the cross
+		}
+
+		else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_DOWN)) // moving the cursor down
+		{
+			yPos = yPos - Increment;
+		}
+
+		else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_RGHT)) // moving the cursor to the right
+		{
+			xPos = xPos + Increment;
+
+		}
+
+		else if (CDriver_Joypad::Instance()->getButtonPressed(CDriver_Joypad::JPAD_BUTTON_LEFT)) // moving the cursor to the left
+		{
+			xPos = xPos - Increment;
+		}
+
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_R1)) // finalize the response
+		{
+			//CEnvironment::Instance()->outputMessage("RsponseFinalize event Joypad");
+			ResponseFinalize = 1; // click the left botton to finalize the response (RIGHT?)
+		}
+	}
+
+
+	if (STATE_RESPONSE)
+	{
+		AnswerDirection = -1; //INITIALIZE RESPONSE
+		isAnswered = false; //RECORD ANSWER STATUS
+							//WE'RE USING UP AND DOWN BUTTONS INSTEAD OF R1 AND L1
+		if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_UP)) // location of T1 identified
+																						 //AlSO NEED TO KNOW WHAT THE ACTUAL PARAMETER OF "UP" IS
+		{
+			WAIT_RESPONSE = 1;
+			// get the time of the response here
+			ResponseTime = m_timerExp.getTime();
+
+			if (isAnswered == false)
+				// RECORD ONLY THE FIRST ENTRY
+			{
+				AnswerDirection = 1; //1 for pressing up, 0 for down
+				isAnswered = true;
+			}
+
+		}
+		else if (CDriver_Joypad::Instance()->getButtonStatus(CDriver_Joypad::JPAD_BUTTON_DOWN)) // location of T1 identified
+																								//AlSO NEED TO KNOW WHAT THE ACTUAL PARAMETER OF "DOWN" IS
+		{
+			WAIT_RESPONSE = 1;
+			// get the time of the response here
+			ResponseTime = m_timerExp.getTime();
+
+			if (isAnswered == false)
+			{
+				AnswerDirection = 0; //1 for pressing up, 0 for down
+				isAnswered = true;
+			}
+
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////////////////////
+void ExperimentBody::gotoFixation()
+{
+
+	SHOW_TARGET = 0;
+	if (!(TestCalibration == 1))
+		CEnvironment::Instance()->outputMessage("Trial Number: %d", (TrialNumber));
+
+
+	hideAllObjects();
+
+	if (TestCalibration == 1)
+	{
+		m_state = STATE_TESTCALIBRATION;
+		//CEnvironment::Instance()->outputMessage("Calibration trial");
+		ResponseFinalize = 0;
+		m_timerCheck.start(500);
+	}
+	else
+	{
+		m_state = STATE_FIXATION;
+		gate = 1;
+		// show the box at the center of the screen
+		//m_box->show();
+
+
+
+
+		// if trial is a catch trial target does not appear
+		TrialType = TrialTypeList[m_curStim + 1];
+		CueDirection = CueDirectionList[m_curStim + 1];
+		//Make sure that Target time doesn't change?
+		//eTargetTime = CueTargetTimingList[m_curStim + 1];
+		// valid trial
+		if (TrialType == 1)
+		{
+			NumberValidTrials++;
+			//SET CUE ANGLE?
+			if (CueDirection == -1)
+			{
+				CEnvironment::Instance()->outputMessage("Valid trial - cue direction to the left ");
+				// note: the cue originally points to the left, when the cue points right, it need to be rotated
+				m_cue->degSetAngle(0);
+				m_response_cue->degSetAngle(0);
+			}
+			if (CueDirection == 1)
+			{
+				CEnvironment::Instance()->outputMessage("Valid trial - cue direction to the right ");
+				m_cue->degSetAngle(180);
+				m_response_cue->degSetAngle(180);
+			}
+			
+		}
+		// invalid trial
+		else if (TrialType == 0)
+		{
+			NumberInvalidTrials++;
+			if (CueDirection == -1)
+			{
+				CEnvironment::Instance()->outputMessage("Invalid trial - cue direction to the left ");
+				m_cue->degSetAngle(0);
+				m_response_cue->degSetAngle(180);
+			}
+			if (CueDirection == 1)
+			{
+				CEnvironment::Instance()->outputMessage("Invalid trial - cue direction to the right ");
+				m_cue->degSetAngle(180);
+				m_response_cue->degSetAngle(0);
+			}
+
+			
+		}
+		// neutral trials (a neutral cue is shown)
+		// target to the right and left??? what does this mean
+		//PROBABLY HAVE TO CHANGE THIS A BIT
+		//randomly generate the direction of the neutral response cue
+		else if (TrialType == 2)
+		{
+			NumberNeutralTrials++;
+			if (CueDirection == -1)
+			{
+				CEnvironment::Instance()->outputMessage("Neutral trial - target to the right ");
+				m_cue->degSetAngle(0);
+			}
+			if (CueDirection == 1)
+			{
+				CEnvironment::Instance()->outputMessage("Neutral trial - target to the left");
+				m_cue->degSetAngle(180);
+			}
+
+			
+		}
+		// catch trial (no target appears)
+		else if (TrialType == 3)
+		{
+			if (CueDirection == -1)
+			{
+				CEnvironment::Instance()->outputMessage("Catch trial - cue direction to the left ");
+				m_cue->degSetAngle(0);
+			}
+			if (CueDirection == 1)
+			{
+				CEnvironment::Instance()->outputMessage("Catch trial - cue direction to the right ");
+				m_cue->degSetAngle(180);
+			}
+			if (CueDirection == 3)
+			{
+				CEnvironment::Instance()->outputMessage("Catch trial - cue direction neutral ");
+			}
+		}
+
+	}
+
+
+	// start the trial
+	WAIT_RESPONSE = 1;
+	startTrial();
+	m_timerExp.start();
+	m_timer.start(1000);
+	gate = 1;
+
+	//we need a cue list.  Might need a stimulus list.  Their stimulus list is a list of cues
+	if (m_curStim == (CueDirectionList.size() - 1))
+	{
+		m_curStim = 0;//loop the stimulus list from the beginning 
+		CEnvironment::Instance()->outputMessage(CEnvironment::ENV_MSG_WARNING, "Cue list exhausted.  Restarting from beginning of list.");
+	}
+
+}
+///////////////////////////////////////////////////////////////////////////////////
+//We need to save the response and the stimulus size here
+//WE NEED TO SAVE THE ACTUAL RESPONSE
+void ExperimentBody::saveData()
+{
+
+	if (ResponseTime>0)
+		// give confrimation of response
+		//do we need the beep
+		//Beep(600,400);
+
+		// time of the response (locked to the start of the trial)
+		storeTrialVariable("ResponseTime", ResponseTime);
+	storeTrialVariable("TimeCueON", TimeCueON);
+	storeTrialVariable("TimeCueOFF", TimeCueOFF);
+	storeTrialVariable("TimeTargetON", TimeTargetON);
+	storeTrialVariable("TimeTargetOFF", TimeTargetOFF);
+	/*
+	storeTrialVariable("TimeResponseCueON", TimeResponseCueON);
+	storeTrialVariable("TimeResponseCueOFF", TimeResponseCueOFF);
+	storeTrialVariable("TimeISI1ON", TimeISI1ON);
+	storeTrialVariable("TimeISI1OFF", TimeISI1OFF);
+	storeTrialVariable("TimeISI2ON", TimeISI2ON);
+	storeTrialVariable("TimeISI2OFF", TimeISI2OFF);
+	*/
+
+	storeTrialVariable("TrialType", TrialType);//*
+	storeTrialVariable("CueDirection", CueDirection);//*
+	storeTrialVariable("GapSize", GapSize);//*
+
+	storeTrialVariable("CorrectAnswer", CorrectAnswer);//*
+	storeTrialVariable("AnswerDirection", AnswerDirection);//*
+	storeTrialVariable("Correctness", isCorrect);//*
+
+
+												 //WE CAN KEEP THIS IF WE WANT, BUT WE NEED TO ADD, GAP SIZE, CORRECT, INCORRECT
+												 //We need to keep track of how  many correct for each gap size for each condition
+//Environment::Instance()->outputMessage("Cue target timing: %.2i", CueTargetTime);
+	if (TrialType == 1)
+	{
+		CurrentRTValid = CurrentRTValid + (ResponseTime - TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("valid trial number - %i ", NumberValidTrials);
+		CEnvironment::Instance()->outputMessage("RT valid (running average) - %f ", CurrentRTValid / NumberValidTrials);
+		//
+	}
+
+	if (TrialType == 0)
+	{
+		CurrentRTInvalid = CurrentRTInvalid + (ResponseTime - TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("invalid trial number - %i ", NumberInvalidTrials);
+		CEnvironment::Instance()->outputMessage("RT invalid (running average) - %f ", CurrentRTInvalid / NumberInvalidTrials);
+	}
+
+	if (TrialType == 2)
+	{
+		CurrentRTNeutral = CurrentRTNeutral + (ResponseTime - TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("neutral trial number - %i ", NumberNeutralTrials);
+		CEnvironment::Instance()->outputMessage("RT neutral (running average) - %f ", CurrentRTNeutral / NumberNeutralTrials);
+	}
+
+
+
+	// save size of stimuli in px
+	//HERE WE WANT TO SAVE THE SIZE OF THE GAP, NOT THE TARGET
+	storeTrialVariable("FixationMarkerSize", m_paramsFile->getInteger(CFG_FIXATION_SIZE));
+	storeTrialVariable("CueSize", m_paramsFile->getInteger(CFG_CUE_SIZE));
+	storeTrialVariable("TargetSize", m_paramsFile->getInteger(CFG_TARGET_SIZE));
+	storeTrialVariable("BoxSize", m_paramsFile->getInteger(CFG_BOX_SIZE));
+
+
+	// 
+	storeTrialVariable("X_TargetOffset", XTargetOffset);//px
+	storeTrialVariable("Subject_Name", m_paramsFile->getString(CFG_SUBJECT_NAME));
+
+	// save information about the test calibration
+	storeTrialVariable("TestCalibration", TestCalibration);
+	storeTrialVariable("xoffset", xshift);
+	storeTrialVariable("yoffset", yshift); //px
+	storeTrialVariable("debug", debug); //px
+
+	//*
+	if (TrialType == 1)
+	{
+		CurrentRTValid = CurrentRTValid + (ResponseTime - TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("valid trial number - %i ", NumberValidTrials);
+		CEnvironment::Instance()->outputMessage("RT valid (running average) - %f ", CurrentRTValid / NumberValidTrials);
+		if (isCorrect) {
+			ValidCorrect = ValidCorrect + 1;
+		}
+		CurrentValid = ValidCorrect / NumberValidTrials;
+		CEnvironment::Instance()->outputMessage("valid trial number - %i ", CurrentValid);
+	}
+
+	if (TrialType == 0)
+	{
+		CurrentRTInvalid = CurrentRTInvalid + (ResponseTime - TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("invalid trial number - %i ", NumberInvalidTrials);
+		CEnvironment::Instance()->outputMessage("RT invalid (running average) - %f ", CurrentRTInvalid / NumberInvalidTrials);
+		if (isCorrect) {
+			InvalidCorrect = InvalidCorrect + 1;
+		}
+		CurrentInvalid = InvalidCorrect / NumberInvalidTrials;
+		CEnvironment::Instance()->outputMessage("valid trial number - %i ", CurrentInvalid);
+	}
+
+	if (TrialType == 2)
+	{
+		CurrentRTNeutral = CurrentRTNeutral + (ResponseTime - TimeTargetOFF);
+		CEnvironment::Instance()->outputMessage("neutral trial number - %i ", NumberNeutralTrials);
+		CEnvironment::Instance()->outputMessage("RT neutral (running average) - %f ", CurrentRTNeutral / NumberNeutralTrials);
+		if (isCorrect) {
+			NeutralCorrect = NeutralCorrect + 1;
+		}
+		CurrentNeutral = NeutralCorrect / NumberNeutralTrials;
+		CEnvironment::Instance()->outputMessage("valid trial number - %i ", CurrentNeutral);
+	}
+	//*
+
+
+
+	saveTrial("./Data/" + m_paramsFile->getString(CFG_SUBJECT_NAME));
+
+	//update progress through session
+	m_sessionEnd = m_curStim - 1;
+
+	// keep track of the test calibration trials
+	m_numTestCalibration++;
+
+	// recalibration active at each trial
+	if (m_numTestCalibration == 1)
+	{
+		xPos = 0;
+		yPos = 0;
+		TestCalibration = 1;
+		ResponseFinalize = 0;
+		m_numTestCalibration = 0;
+		m_timerCheck.start(100);
+		m_whitecross->pxSetPosition(0, 0);
+		m_whitecross->show();
+	}
+
+	m_curStim++;
+	m_numCompleted++;
+	TrialNumber++;
+	CEnvironment::Instance()->outputMessage("-----------------------------------------------------");
+	XTargetOffset = m_paramsFile->getInteger(CFG_TARGET_OFFSET);
+	gotoFixation();
+
+}
+///////////////////////////////////////////////////////////////////////////////////
+
+void ExperimentBody::loadSession()
+{
+	//read stmuli from the stim list 
+	// [ stimList contains information about whether the cue indicates left or right and whether it is valid, invalid or neutral]
+	ostringstream fstr1;
+	fstr1 << "StimList.txt";
+
+	string tempStr;
+	int tempInt;
+	ifstream in1(fstr1.str().c_str());
+
+	if (!in1.is_open())
+	{
+		CEnvironment::Instance()->outputMessage(CEnvironment::ENV_MSG_ERROR, "Session data file (%sStimList.txt) could not be opened.  Please check that the file exists.", m_paramsFile->getString(CFG_SUBJECT_NAME));
+		declareFinished();
+
+	}
+
+	// the first number on each sequence in the StimList indicates the trial number
+	// the second number indicates whether the cue indicates left or right (-1= left 1= right)
+	// the third number indicats whether the cue is valid invalid or neutral (valid = 1 invalid = 0 neutral = 2 catch = 3)
+
+	while (in1.peek() != EOF)
+	{
+		
+
+
+		in1 >> tempInt;// discard (trialnumber)
+
+		in1 >> tempInt; // left gap direction
+		LGapDirectionList.push_back(tempInt);
+
+		in1 >> tempInt; // right gap direction
+		RGapDirectionList.push_back(tempInt);
+
+		in1 >> tempInt; // cue direction
+		CueDirectionList.push_back(tempInt);
+
+		in1 >> tempInt; // gap size
+		GapSizeList.push_back(tempInt);
+
+		in1 >> tempInt; // trial type
+		TrialTypeList.push_back(tempInt);
+
+		in1 >> tempStr;//discard *
+
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+void ExperimentBody::loadProgress()
+{
+	//read in progress from [SubjectName]Progress.txt
+	ostringstream fstr1;
+	fstr1 << "Data\\" << m_paramsFile->getString(CFG_SUBJECT_NAME) << "\\" << m_paramsFile->getString(CFG_SUBJECT_NAME) << "Progress2.txt";
+
+	string tempStr1;
+	string discard;
+	int tempInt1, tempInt2;
+	ifstream in1(fstr1.str().c_str());
+
+	if (!in1.is_open())
+	{
+		CEnvironment::Instance()->outputMessage(CEnvironment::ENV_MSG_ERROR, "Progress data file (%sProgress.txt) could not be opened for writing.  Please check that the file exists.", m_paramsFile->getString(CFG_SUBJECT_NAME));
+		declareFinished();
+
+	}
+
+	bool empty = true;
+
+	while (in1.peek() != EOF)//EOF = end of file
+	{
+		in1 >> discard;//discard date line
+		in1 >> tempInt1;
+		in1 >> tempInt2;
+
+		empty = false;
+
+	}
+
+	if (empty == false)
+	{
+
+		m_sessionBegin = tempInt2 + 1;
+		m_sessionEnd = tempInt2 + 1;
+		m_curStim = tempInt2 + 1;
+
+	}
+	else
+	{
+		m_sessionBegin = 0;
+		m_sessionEnd = 0;
+		m_curStim = 0;
+
+	}
+
+}
